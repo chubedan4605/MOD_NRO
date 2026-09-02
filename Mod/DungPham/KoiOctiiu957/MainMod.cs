@@ -844,6 +844,10 @@ namespace Mod.DungPham.KoiOctiiu957
 			}
 			else if (GameCanvas.keyAsciiPress == Hotkeys.M)
 			{
+				if (TileMap.mapID == 21 || TileMap.mapID == 22 || TileMap.mapID == 23)
+		{
+			return;
+		}
 				Service.gI().openUIZone();
 				GameCanvas.panel.setTypeZone();
 				GameCanvas.panel.show();
@@ -1719,7 +1723,7 @@ namespace Mod.DungPham.KoiOctiiu957
 						MainMod.paintCharInfo(g, charFocus);
 					}
 					bool flag = MainMod.isBoss(char2);
-					string arg = flag ? ("B: " + char2.cName + " [" + NinjaUtil.getMoneys(char2.cHP) + "]") : (char2.getGender() + ": " + char2.cName + " [" + NinjaUtil.getMoneys(char2.cHP) + "]");
+					string arg = flag ? ("BOT: " + char2.cName + " [" + NinjaUtil.getMoneys(char2.cHP) + "]") : (char2.getGender() + ": " + char2.cName + " [" + NinjaUtil.getMoneys(char2.cHP) + "]");
 					int x = num2 + 2;
 					if (charFocus != null && charFocus == char2)
 					{

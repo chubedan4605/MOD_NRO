@@ -174,7 +174,7 @@ public class ItemTime
 	public void update()
 	{
 		this.curr = mSystem.currentTimeMillis();
-		if (TileMap.mapID == 21)
+		if (TileMap.mapID == 21 || TileMap.mapID == 22 || TileMap.mapID == 23)
 		{
 			return;
 		}
