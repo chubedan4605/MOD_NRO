@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using Assets.src.e;
 using UnityEngine;
@@ -6,12 +6,34 @@ using UnityEngine;
 // Token: 0x0200002C RID: 44
 public class mGraphics
 {
+	public static void clearCachedTextures()
+	{
+		try
+		{
+			foreach (DictionaryEntry dictionaryEntry in mGraphics.cachedTextures)
+			{
+				Texture texture = dictionaryEntry.Value as Texture;
+				if (texture != null)
+				{
+					UnityEngine.Object.Destroy(texture);
+				}
+			}
+		}
+		catch
+		{
+		}
+		finally
+		{
+			mGraphics.cachedTextures.Clear();
+		}
+	}
+
 	// Token: 0x060001AE RID: 430 RVA: 0x00011698 File Offset: 0x0000F898
 	private void cache(string key, Texture value)
 	{
 		if (mGraphics.cachedTextures.Count > 400)
 		{
-			mGraphics.cachedTextures.Clear();
+			mGraphics.clearCachedTextures();
 		}
 		if (value.width * value.height < GameCanvas.w * GameCanvas.h)
 		{

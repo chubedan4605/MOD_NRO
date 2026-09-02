@@ -72,52 +72,24 @@ namespace Mod.DungPham.KoiOctiiu957
 				AutoChat.Update();
 				ModSkin.Update();
 
+				if (mSystem.currentTimeMillis() - MainMod.lastTimeAutoGCC >= 180000L)
+				{
+					MainMod.lastTimeAutoGCC = mSystem.currentTimeMillis();
+					mSystem.gcc();
+				}
 				try
 				{
-					List<global::Char> listChar = new List<global::Char>();
-					if (global::Char.myCharz() != null) listChar.Add(global::Char.myCharz());
+					if (global::Char.myCharz() != null)
+					{
+						MainMod.updateCharEff(global::Char.myCharz());
+					}
 					for (int i = 0; i < GameScr.vCharInMap.size(); i++)
 					{
 						global::Char c = (global::Char)GameScr.vCharInMap.elementAt(i);
-						if (c != null) listChar.Add(c);
-					}
-					foreach (global::Char c in listChar)
-					{
-						if (c.protectEff)
+						if (c != null)
 						{
-							if (!dictTimeShield.ContainsKey(c.charID)) dictTimeShield[c.charID] = mSystem.currentTimeMillis();
+							MainMod.updateCharEff(c);
 						}
-						else if (dictTimeShield.ContainsKey(c.charID)) dictTimeShield.Remove(c.charID);
-
-						if (c.holdEffID != 0)
-						{
-							if (!dictTimeTie.ContainsKey(c.charID)) dictTimeTie[c.charID] = mSystem.currentTimeMillis();
-						}
-						else if (dictTimeTie.ContainsKey(c.charID)) dictTimeTie.Remove(c.charID);
-
-						if (c.sleepEff)
-						{
-							if (!dictTimeSleep.ContainsKey(c.charID)) dictTimeSleep[c.charID] = mSystem.currentTimeMillis();
-						}
-						else if (dictTimeSleep.ContainsKey(c.charID)) dictTimeSleep.Remove(c.charID);
-
-						if ((int)c.isMonkey == 1)
-						{
-							if (!dictTimeMonkey.ContainsKey(c.charID)) dictTimeMonkey[c.charID] = mSystem.currentTimeMillis();
-						}
-						else if (dictTimeMonkey.ContainsKey(c.charID)) dictTimeMonkey.Remove(c.charID);
-						
-						if (c.huytSao)
-						{
-							if (!dictTimeWhistle.ContainsKey(c.charID)) dictTimeWhistle[c.charID] = mSystem.currentTimeMillis();
-						}
-						else if (dictTimeWhistle.ContainsKey(c.charID)) dictTimeWhistle.Remove(c.charID);
-
-						if (c.stone)
-						{
-							if (!dictTimeStone.ContainsKey(c.charID)) dictTimeStone[c.charID] = mSystem.currentTimeMillis();
-						}
-						else if (dictTimeStone.ContainsKey(c.charID)) dictTimeStone.Remove(c.charID);
 					}
 				}
 				catch { }
@@ -845,9 +817,9 @@ namespace Mod.DungPham.KoiOctiiu957
 			else if (GameCanvas.keyAsciiPress == Hotkeys.M)
 			{
 				if (TileMap.mapID == 21 || TileMap.mapID == 22 || TileMap.mapID == 23)
-		{
-			return;
-		}
+				{
+					return;
+				}
 				Service.gI().openUIZone();
 				GameCanvas.panel.setTypeZone();
 				GameCanvas.panel.show();
@@ -2225,6 +2197,64 @@ namespace Mod.DungPham.KoiOctiiu957
 			}
 		}
 
+		public static void updateCharEff(global::Char c)
+		{
+			if (c == null)
+			{
+				return;
+			}
+			if (c.protectEff)
+			{
+				if (!dictTimeShield.ContainsKey(c.charID)) dictTimeShield[c.charID] = mSystem.currentTimeMillis();
+			}
+			else if (dictTimeShield.ContainsKey(c.charID)) dictTimeShield.Remove(c.charID);
+
+			if (c.holdEffID != 0)
+			{
+				if (!dictTimeTie.ContainsKey(c.charID)) dictTimeTie[c.charID] = mSystem.currentTimeMillis();
+			}
+			else if (dictTimeTie.ContainsKey(c.charID)) dictTimeTie.Remove(c.charID);
+
+			if (c.sleepEff)
+			{
+				if (!dictTimeSleep.ContainsKey(c.charID)) dictTimeSleep[c.charID] = mSystem.currentTimeMillis();
+			}
+			else if (dictTimeSleep.ContainsKey(c.charID)) dictTimeSleep.Remove(c.charID);
+
+			if ((int)c.isMonkey == 1)
+			{
+				if (!dictTimeMonkey.ContainsKey(c.charID)) dictTimeMonkey[c.charID] = mSystem.currentTimeMillis();
+			}
+			else if (dictTimeMonkey.ContainsKey(c.charID)) dictTimeMonkey.Remove(c.charID);
+			
+			if (c.huytSao)
+			{
+				if (!dictTimeWhistle.ContainsKey(c.charID)) dictTimeWhistle[c.charID] = mSystem.currentTimeMillis();
+			}
+			else if (dictTimeWhistle.ContainsKey(c.charID)) dictTimeWhistle.Remove(c.charID);
+
+			if (c.stone)
+			{
+				if (!dictTimeStone.ContainsKey(c.charID)) dictTimeStone[c.charID] = mSystem.currentTimeMillis();
+			}
+			else if (dictTimeStone.ContainsKey(c.charID)) dictTimeStone.Remove(c.charID);
+		}
+
+		public static void clearMapData()
+		{
+			try
+			{
+				dictTimeShield.Clear();
+				dictTimeTie.Clear();
+				dictTimeSleep.Clear();
+				dictTimeMonkey.Clear();
+				dictTimeWhistle.Clear();
+				dictTimeStone.Clear();
+				listCharsInMap.Clear();
+			}
+			catch { }
+		}
+
 		// Token: 0x0400169E RID: 5790
 		public static bool isLockMap = false;
 		public static Dictionary<int, long> dictTimeShield = new Dictionary<int, long>();
@@ -2235,6 +2265,7 @@ namespace Mod.DungPham.KoiOctiiu957
 		public static Dictionary<int, long> dictTimeStone = new Dictionary<int, long>();
 		public static int infoStartX = 0;
 		public static int infoStartY = 62;
+		public static long lastTimeAutoGCC = 0L;
 
 	}
 }

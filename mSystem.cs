@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Text;
 using UnityEngine;
@@ -461,6 +461,7 @@ public class mSystem
 	// Token: 0x06000123 RID: 291 RVA: 0x00004B56 File Offset: 0x00002D56
 	public static void gcc()
 	{
+		mGraphics.clearCachedTextures();
 		Resources.UnloadUnusedAssets();
 		GC.Collect();
 	}

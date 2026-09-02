@@ -3,6 +3,7 @@ using Assets.src.e;
 using Assets.src.f;
 using Assets.src.g;
 using UnityEngine;
+using Mod.DungPham.KoiOctiiu957;
 
 // Token: 0x02000099 RID: 153
 public class Controller : IMessageHandler
@@ -2995,6 +2996,8 @@ public class Controller : IMessageHandler
 				GameCanvas.resetBg();
 				GameScr.gI().resetButton();
 				GameScr.gI().center = null;
+				mSystem.gcc();
+				MainMod.clearMapData();
 				if (Effect.vEffData.size() > 15)
 				{
 					for (int num130 = 0; num130 < 5; num130++)
