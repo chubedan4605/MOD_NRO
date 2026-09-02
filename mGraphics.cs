@@ -31,7 +31,7 @@ public class mGraphics
 	// Token: 0x060001AE RID: 430 RVA: 0x00011698 File Offset: 0x0000F898
 	private void cache(string key, Texture value)
 	{
-		if (mGraphics.cachedTextures.Count > 400)
+		if (mGraphics.cachedTextures.Count > 2000)
 		{
 			mGraphics.clearCachedTextures();
 		}

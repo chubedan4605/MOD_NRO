@@ -2996,7 +2996,7 @@ public class Controller : IMessageHandler
 				GameCanvas.resetBg();
 				GameScr.gI().resetButton();
 				GameScr.gI().center = null;
-				mSystem.gcc();
+				mGraphics.clearCachedTextures();
 				MainMod.clearMapData();
 				if (Effect.vEffData.size() > 15)
 				{

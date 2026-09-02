@@ -72,11 +72,6 @@ namespace Mod.DungPham.KoiOctiiu957
 				AutoChat.Update();
 				ModSkin.Update();
 
-				if (mSystem.currentTimeMillis() - MainMod.lastTimeAutoGCC >= 180000L)
-				{
-					MainMod.lastTimeAutoGCC = mSystem.currentTimeMillis();
-					mSystem.gcc();
-				}
 				try
 				{
 					if (global::Char.myCharz() != null)
@@ -1172,7 +1167,7 @@ namespace Mod.DungPham.KoiOctiiu957
 			{
 				result = false;
 			}
-						else if (text.Equals("copy"))
+			else if (text.Equals("copy"))
 			{
 				global::Char focus = global::Char.myCharz().charFocus;
 				if (focus == null)
@@ -2265,7 +2260,6 @@ namespace Mod.DungPham.KoiOctiiu957
 		public static Dictionary<int, long> dictTimeStone = new Dictionary<int, long>();
 		public static int infoStartX = 0;
 		public static int infoStartY = 62;
-		public static long lastTimeAutoGCC = 0L;
 
 	}
 }
