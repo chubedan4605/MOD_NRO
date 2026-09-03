@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 // Token: 0x020000B5 RID: 181
@@ -39,10 +39,12 @@ public class LoginScr : mScreen, IActionListener
 		this.tfUser.height = mScreen.ITEM_HEIGHT + 2;
 		this.tfUser.isFocus = true;
 		this.tfUser.setIputType(TField.INPUT_TYPE_ANY);
+		this.tfUser.isVietnamese = false;
 		this.tfUser.name = (((int)mResources.language != 2) ? (mResources.phone + "/") : string.Empty) + mResources.email;
 		this.tfPass = new TField();
 		this.tfPass.y = GameCanvas.hh - 4;
 		this.tfPass.setIputType(TField.INPUT_TYPE_PASSWORD);
+		this.tfPass.isVietnamese = false;
 		this.tfPass.width = this.wC;
 		this.tfPass.height = mScreen.ITEM_HEIGHT + 2;
 		this.yt += 35;

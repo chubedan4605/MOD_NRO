@@ -7,6 +7,7 @@ public class ChatTextField : IActionListener
 	public ChatTextField()
 	{
 		this.tfChat = new TField();
+		this.tfChat.isVietnamese = true;
 		if (Main.isWindowsPhone)
 		{
 			this.tfChat.showSubTextField = false;

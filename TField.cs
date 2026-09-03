@@ -80,6 +80,7 @@ public class TField : IActionListener
 	// Token: 0x060000D6 RID: 214 RVA: 0x0000BB08 File Offset: 0x00009D08
 	public void init()
 	{
+		this.isVietnamese = true;
 		TField.CARET_HEIGHT = mScreen.ITEM_HEIGHT + 1;
 		this.cmdClear = new Command(mResources.DELETE, this, 1000, null);
 		if (Main.isPC)
@@ -276,7 +277,7 @@ public class TField : IActionListener
 		{
 			return;
 		}
-		if (this.inputType == TField.INPUT_TYPE_ANY && Mod.DungPham.KoiOctiiu957.VietnameseTelex.isEnabled)
+		if (this.isVietnamese && this.inputType == TField.INPUT_TYPE_ANY && Mod.DungPham.KoiOctiiu957.VietnameseTelex.isEnabled)
 		{
 			string strBefore = this.text.Substring(0, this.caretPos);
 			string strAfter = this.text.Substring(this.caretPos);
@@ -828,6 +829,8 @@ public class TField : IActionListener
 
 	// Token: 0x0400009A RID: 154
 	public bool isFocus;
+
+	public bool isVietnamese = true;
 
 	// Token: 0x0400009B RID: 155
 	public int x;
