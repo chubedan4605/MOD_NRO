@@ -1673,6 +1673,18 @@ namespace Mod.DungPham.KoiOctiiu957
 			global::Char charFocus = @char.charFocus;
 			int num2 = GameCanvas.w - MainMod.widthRect;
 			MainMod.infoStartY = 62;
+			for (int j = 0; j < MainMod.listCharsInMap.Count; j++)
+			{
+				global::Char c = MainMod.listCharsInMap[j];
+				if (c != null && c.isNRD && !string.IsNullOrEmpty(c.cName) && !c.isPet && !c.isMiniPet && !c.cName.StartsWith("#") && !c.cName.StartsWith("$") && !(c.cName == "Trọng tài"))
+				{
+					MainMod.paintCharInfo(g, c);
+				}
+			}
+			if (charFocus != null && !charFocus.isNRD && !string.IsNullOrEmpty(charFocus.cName) && !charFocus.isPet && !charFocus.isMiniPet && !charFocus.cName.StartsWith("#") && !charFocus.cName.StartsWith("$") && !(charFocus.cName == "Trọng tài"))
+			{
+				MainMod.paintCharInfo(g, charFocus);
+			}
 			for (int i = 0; i < MainMod.listCharsInMap.Count; i++)
 			{
 				global::Char char2 = MainMod.listCharsInMap[i];
@@ -1681,14 +1693,6 @@ namespace Mod.DungPham.KoiOctiiu957
 				MainMod.paintPKFlag(g, char2, num);
 				if (!string.IsNullOrEmpty(char2.cName) && !char2.isPet && !char2.isMiniPet && !char2.cName.StartsWith("#") && !char2.cName.StartsWith("$") && !(char2.cName == "Trọng tài"))
 				{
-					if (char2.isNRD)
-					{
-						MainMod.paintCharInfo(g, char2);
-					}
-					else if (charFocus != null && charFocus == char2)
-					{
-						MainMod.paintCharInfo(g, charFocus);
-					}
 					bool flag = MainMod.isBoss(char2);
 					string arg = flag ? ("BOT: " + char2.cName + " [" + NinjaUtil.getMoneys(char2.cHP) + "]") : (char2.getGender() + ": " + char2.cName + " [" + NinjaUtil.getMoneys(char2.cHP) + "]");
 					int x = num2 + 2;
