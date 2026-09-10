@@ -2203,9 +2203,9 @@ namespace Mod.DungPham.KoiOctiiu957
 		{
 			if (isAutoLogin && isDisconnecting)
 			{
-				if (mSystem.currentTimeMillis() - timeDisconnect > 10000L)
+				if (mSystem.currentTimeMillis() - timeDisconnect > 5000L)
 				{
-					isDisconnecting = false;
+					timeDisconnect = mSystem.currentTimeMillis();
 					if (GameCanvas.currentScreen == GameCanvas.serverScreen)
 					{
 						GameCanvas.endDlg();
@@ -2215,6 +2215,7 @@ namespace Mod.DungPham.KoiOctiiu957
 					{
 						GameCanvas.endDlg();
 						GameCanvas.loginScr.doLogin();
+						isDisconnecting = false;
 					}
 				}
 			}
