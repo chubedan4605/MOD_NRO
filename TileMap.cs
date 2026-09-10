@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 // Token: 0x020000CB RID: 203
 public class TileMap
@@ -143,7 +143,6 @@ public class TileMap
 		{
 			TileMap.imgWaterlowN2 = GameCanvas.loadImageRMS("/tWater/wtsN2.png");
 		}
-		mSystem.gcc();
 	}
 
 	// Token: 0x06000A57 RID: 2647 RVA: 0x0009B28C File Offset: 0x0009948C

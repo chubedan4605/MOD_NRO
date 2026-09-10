@@ -2996,7 +2996,6 @@ public class Controller : IMessageHandler
 				GameCanvas.resetBg();
 				GameScr.gI().resetButton();
 				GameScr.gI().center = null;
-				mGraphics.clearCachedTextures();
 				MainMod.clearMapData();
 				if (Effect.vEffData.size() > 15)
 				{
@@ -5115,7 +5114,6 @@ public class Controller : IMessageHandler
 				{
 				}
 			}
-			Resources.UnloadUnusedAssets();
 			GameCanvas.debug("SA75x5", 2);
 			num = (int)msg.reader().readByte();
 			Mob.newMob.removeAllElements();
