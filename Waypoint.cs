@@ -79,13 +79,20 @@ public class Waypoint : IActionListener
 				}
 				else if (global::Char.myCharz().isInEnterOnlinePoint() != null)
 				{
-					Service.gI().charMove();
-					Service.gI().requestChangeMap();
-					global::Char.isLockKey = true;
-					global::Char.ischangingMap = true;
-					GameCanvas.clearKeyHold();
-					GameCanvas.clearKeyPressed();
-					InfoDlg.showWait();
+					if (Mod.DungPham.KoiOctiiu957.MainMod.isLockMap && !Mod.DungPham.KoiOctiiu957.AutoMap.isAutoChangeMap)
+					{
+						global::Char.myCharz().currentMovePoint = null;
+					}
+					else
+					{
+						Service.gI().charMove();
+						Service.gI().requestChangeMap();
+						global::Char.isLockKey = true;
+						global::Char.ischangingMap = true;
+						GameCanvas.clearKeyHold();
+						GameCanvas.clearKeyPressed();
+						InfoDlg.showWait();
+					}
 				}
 				else
 				{

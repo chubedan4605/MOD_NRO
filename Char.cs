@@ -1190,22 +1190,29 @@ public class Char : IMapObject
 					}
 					if (!global::Char.ischangingMap && this.isInWaypoint())
 					{
-						Service.gI().charMove();
-						if (TileMap.isTrainingMap())
+						if (Mod.DungPham.KoiOctiiu957.MainMod.isLockMap && !Mod.DungPham.KoiOctiiu957.AutoMap.isAutoChangeMap)
 						{
-							Service.gI().getMapOffline();
-							global::Char.ischangingMap = true;
+							// Do not lock key or request change map
 						}
 						else
 						{
-							Service.gI().requestChangeMap();
+							Service.gI().charMove();
+							if (TileMap.isTrainingMap())
+							{
+								Service.gI().getMapOffline();
+								global::Char.ischangingMap = true;
+							}
+							else
+							{
+								Service.gI().requestChangeMap();
+							}
+							global::Char.isLockKey = true;
+							global::Char.ischangingMap = true;
+							GameCanvas.clearKeyHold();
+							GameCanvas.clearKeyPressed();
+							InfoDlg.showWait();
+							return;
 						}
-						global::Char.isLockKey = true;
-						global::Char.ischangingMap = true;
-						GameCanvas.clearKeyHold();
-						GameCanvas.clearKeyPressed();
-						InfoDlg.showWait();
-						return;
 					}
 					if (this.statusMe != 4 && Res.abs(this.cx - this.cxSend) + Res.abs(this.cy - this.cySend) >= 70 && this.cy - this.cySend <= 0 && this.me)
 					{
@@ -2876,22 +2883,29 @@ public class Char : IMapObject
 		}
 		if (this.me && !global::Char.ischangingMap && this.isInWaypoint())
 		{
-			Service.gI().charMove();
-			if (TileMap.isTrainingMap())
+			if (Mod.DungPham.KoiOctiiu957.MainMod.isLockMap && !Mod.DungPham.KoiOctiiu957.AutoMap.isAutoChangeMap)
 			{
-				global::Char.ischangingMap = true;
-				Service.gI().getMapOffline();
+				// Ignore waypoint when map is locked
 			}
 			else
 			{
-				Service.gI().requestChangeMap();
+				Service.gI().charMove();
+				if (TileMap.isTrainingMap())
+				{
+					global::Char.ischangingMap = true;
+					Service.gI().getMapOffline();
+				}
+				else
+				{
+					Service.gI().requestChangeMap();
+				}
+				global::Char.isLockKey = true;
+				global::Char.ischangingMap = true;
+				GameCanvas.clearKeyHold();
+				GameCanvas.clearKeyPressed();
+				InfoDlg.showWait();
+				return;
 			}
-			global::Char.isLockKey = true;
-			global::Char.ischangingMap = true;
-			GameCanvas.clearKeyHold();
-			GameCanvas.clearKeyPressed();
-			InfoDlg.showWait();
-			return;
 		}
 		if (this.statusMe != 16 && (TileMap.tileTypeAt(this.cx, this.cy - this.ch + 24, 8192) || this.cy < 0))
 		{
