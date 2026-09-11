@@ -64,6 +64,7 @@ namespace Mod.DungPham.KoiOctiiu957
 						long num = long.Parse(ChatTextField.gI().tfChat.getText());
 						AutoSkill.timeAutoSkills[AutoSkill.indexSkillAuto] = num;
 						AutoSkill.isAutoUseSkills[AutoSkill.indexSkillAuto] = true;
+						AutoSkill.lastTimeUseSkill[AutoSkill.indexSkillAuto] = mSystem.currentTimeMillis() - 999999999L;
 						GameScr.info1.addInfo(string.Concat(new string[]
 						{
 							"Auto ",
@@ -184,6 +185,7 @@ namespace Mod.DungPham.KoiOctiiu957
 				if (AutoSkill.isAutoUseSkills[num])
 				{
 					AutoSkill.timeAutoSkills[num] = -1L;
+					AutoSkill.lastTimeUseSkill[num] = mSystem.currentTimeMillis() - 999999999L;
 				}
 				GameScr.info1.addInfo("Auto " + GameScr.keySkill[num].template.name + (AutoSkill.isAutoUseSkills[num] ? (": " + NinjaUtil.getMoneys(AutoSkill.timeAutoSkills[num]) + " mili giây") : "\n[STATUS: OFF]"), 0);
 				return;
@@ -393,11 +395,15 @@ namespace Mod.DungPham.KoiOctiiu957
 				}
 				if (GameScr.keySkill[skillIndex] != null && !GameScr.keySkill[skillIndex].paintCanNotUseSkill)
 				{
+					if (mSystem.currentTimeMillis() - GameScr.keySkill[skillIndex].lastTimeUseThisSkill < (long)GameScr.keySkill[skillIndex].coolDown)
+					{
+						return;
+					}
 					if (GameScr.keySkill[skillIndex].coolDown == 0)
 					{
 						AutoSkill.timeAutoSkills[skillIndex] = 500L;
 					}
-					if (AutoSkill.isMeHasEnoughMP(GameScr.keySkill[skillIndex]) && !GameScr.gI().isCharging() && mSystem.currentTimeMillis() - AutoSkill.lastTimeAutoUseSkill > 150L)
+					if (AutoSkill.isMeHasEnoughMP(GameScr.keySkill[skillIndex]) && !GameScr.gI().isCharging() && mSystem.currentTimeMillis() - AutoSkill.lastTimeAutoUseSkill > 500L)
 					{
 						if (AutoSkill.timeAutoSkills[skillIndex] == -1L)
 						{
@@ -408,8 +414,9 @@ namespace Mod.DungPham.KoiOctiiu957
 							long num = mSystem.currentTimeMillis();
 							AutoSkill.lastTimeUseSkill[skillIndex] = num;
 							AutoSkill.lastTimeAutoUseSkill = num;
-							if (GameScr.keySkill[skillIndex].template.isSkillSpec())
+							if (GameScr.keySkill[skillIndex].template.isUseAlone() || GameScr.keySkill[skillIndex].template.isSkillSpec())
 							{
+								GameScr.gI().doSelectSkill(GameScr.keySkill[skillIndex], true);
 								GameScr.gI().doSelectSkill(GameScr.keySkill[skillIndex], true);
 							}
 							else

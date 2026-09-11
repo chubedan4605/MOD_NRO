@@ -3503,7 +3503,7 @@ public class GameScr : mScreen, IChatable
 		{
 			return;
 		}
-		if (global::Char.myCharz().isSelectingSkillUseAlone())
+		if (skill != null && skill.template.isUseAlone())
 		{
 			Res.outz("HERE");
 			this.doUseSkillNotFocus(skill);
@@ -5362,6 +5362,7 @@ public class GameScr : mScreen, IChatable
 		int xMP = 83 + GameScr.mpBarW / 2;
 		mFont.paintDamageWhite(g, NinjaUtil.getMoneys(c.cHP), xHP, 4, mFont.CENTER, 13);
 		mFont.paintDamageYellow(g, NinjaUtil.getMoneys(c.cMP), xMP, 17, mFont.CENTER, 13);
+		
 	}
 
 	// Token: 0x0600078B RID: 1931 RVA: 0x000045ED File Offset: 0x000027ED
