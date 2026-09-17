@@ -46,6 +46,9 @@ public class Session_ME : ISession
 	// Token: 0x0600015B RID: 347 RVA: 0x0000E798 File Offset: 0x0000C998
 	public void connect(string host, int port)
 	{
+		Mod.DungPham.KoiOctiiu957.MainMod.serverHost = host;
+		Mod.DungPham.KoiOctiiu957.MainMod.serverPort = port;
+		Mod.DungPham.KoiOctiiu957.MainMod.StartPingThread();
 		if (Session_ME.connected || Session_ME.connecting)
 		{
 			Debug.Log(string.Concat(new object[]

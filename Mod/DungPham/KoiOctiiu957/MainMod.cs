@@ -1,3 +1,6 @@
+using System.Net.Sockets;
+using System.Diagnostics;
+using System.Threading;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,6 +28,8 @@ namespace Mod.DungPham.KoiOctiiu957
 		}
 
 		// Token: 0x06000B95 RID: 2965 RVA: 0x000A8640 File Offset: 0x000A6840
+		
+
 		public static void Update()
 		{
 			if ((!MobCapcha.isAttack || !MobCapcha.explode) && GameScr.gI().mobCapcha != null)
@@ -107,7 +112,9 @@ namespace Mod.DungPham.KoiOctiiu957
 			}
 			mFont.tahoma_7.drawString(g, string.Concat(new string[]
 			{
-				"Map: ",
+				"Map: [",
+				TileMap.mapID.ToString(),
+				"] ",
 				TileMap.mapNames[TileMap.mapID],
 				" [",
 				TileMap.zoneID.ToString(),
@@ -121,9 +128,7 @@ namespace Mod.DungPham.KoiOctiiu957
 				"X: ",
 				global::Char.myCharz().cx.ToString(),
 				" - ",
-				global::Char.myCharz().cy.ToString(),
-				" , FPS: ",
-				string.Format("{0:0.#}", System.Math.Round((double)(1f / Time.smoothDeltaTime * Time.timeScale), 1))
+				global::Char.myCharz().cy.ToString()
 			}), 25, startY, 0);
 			startY += 10;
 				
@@ -2167,6 +2172,49 @@ namespace Mod.DungPham.KoiOctiiu957
 		public static string[] inputDistanceMove = new string[] { "Nhập Khoảng Cách Di Chuyển (px)", "Khoảng cách" };
 
 		public static int targetFPS = 60;
+
+		public static int ping;
+		public static string serverHost = "";
+		public static int serverPort = 14445;
+		public static bool isPingThreadRunning = false;
+
+		public static void StartPingThread()
+		{
+			if (MainMod.isPingThreadRunning) return;
+			MainMod.isPingThreadRunning = true;
+			new Thread(() => {
+				while (true)
+				{
+					try
+					{
+						if (!string.IsNullOrEmpty(MainMod.serverHost) && Session_ME.connected)
+						{
+							Stopwatch sw = new Stopwatch();
+							sw.Start();
+							using (TcpClient client = new TcpClient())
+							{
+								var result = client.BeginConnect(MainMod.serverHost, MainMod.serverPort, null, null);
+								bool success = result.AsyncWaitHandle.WaitOne(1000);
+								if (success)
+								{
+									client.EndConnect(result);
+									sw.Stop();
+									MainMod.ping = (int)sw.ElapsedMilliseconds;
+								}
+								else
+								{
+									MainMod.ping = -1;
+								}
+							}
+						}
+					}
+					catch {
+						MainMod.ping = -2;
+					}
+					Thread.Sleep(2000);
+				}
+			}).Start();
+		}
 		public static string[] inputFPS = new string[] { "Nhập mức FPS mong muốn", "FPS" };
 
 		// Token: 0x0400169D RID: 5789

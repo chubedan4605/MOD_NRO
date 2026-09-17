@@ -5363,6 +5363,13 @@ public class GameScr : mScreen, IChatable
 		mFont.paintDamageWhite(g, NinjaUtil.getMoneys(c.cHP), xHP, 4, mFont.CENTER, 13);
 		mFont.paintDamageYellow(g, NinjaUtil.getMoneys(c.cMP), xMP, 17, mFont.CENTER, 13);
 		
+		if (c.charID == global::Char.myCharz().charID)
+		{
+			int fps = (int)System.Math.Round((double)(1f / UnityEngine.Time.smoothDeltaTime * UnityEngine.Time.timeScale), 0);
+			int ping = Mod.DungPham.KoiOctiiu957.MainMod.ping;
+			int yPos = (global::Char.myCharz().secondPower > 0) ? 52 : 38;
+			mFont.tahoma_7_red.drawString(g, "FPS: " + fps + " - " + ping + " ms", 80, yPos, 0);
+		}
 	}
 
 	// Token: 0x0600078B RID: 1931 RVA: 0x000045ED File Offset: 0x000027ED
