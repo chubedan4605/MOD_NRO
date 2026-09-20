@@ -325,6 +325,18 @@ namespace Mod.DungPham.KoiOctiiu957
 				SaveData();
 				GameScr.info1.addInfo("Đã xóa hết DS Boss!\n(Auto đánh mọi Boss)", 0);
 				return;
+			case 6:
+				string clip = UnityEngine.GUIUtility.systemCopyBuffer;
+				if (!string.IsNullOrEmpty(clip))
+				{
+					clip = clip.Trim();
+					AddBossTarget(clip);
+				}
+				else
+				{
+					GameScr.info1.addInfo("Clipboard trống!", 0);
+				}
+				return;
 			case 10:
 				if (p is string)
 				{
@@ -344,6 +356,7 @@ namespace Mod.DungPham.KoiOctiiu957
 			MyVector myVector = new MyVector();
 			myVector.addElement(new Command("Auto Đánh Boss\n" + (isAutoAttackBoss ? "[STATUS: ON]" : "[STATUS: OFF]"), getInstance(), 1, null));
 			myVector.addElement(new Command("Nhập Tên Boss", getInstance(), 2, null));
+			myVector.addElement(new Command("Dán Boss Từ Clipboard", getInstance(), 6, null));
 			myVector.addElement(new Command("Thêm Boss Đang Chọn", getInstance(), 3, null));
 			myVector.addElement(new Command("DS Boss Mục Tiêu (" + listBossTargets.Count + ")", getInstance(), 4, null));
 			if (listBossTargets.Count > 0)

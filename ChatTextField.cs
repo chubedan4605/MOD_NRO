@@ -37,8 +37,12 @@ public class ChatTextField : IActionListener
 	{
 		this.left = new Command(mResources.OK, this, 8000, null, 1, GameCanvas.h - mScreen.cmdH + 1);
 		this.right = new Command(mResources.DELETE, this, 8001, null, GameCanvas.w - 70, GameCanvas.h - mScreen.cmdH + 1);
-		this.center = null;
+		this.center = new Command("Dán", this, 8002, null, GameCanvas.w / 2 - 34, GameCanvas.h - mScreen.cmdH + 1);
 		this.w = this.tfChat.width + 20;
+		if (this.w < 260)
+		{
+			this.w = 260;
+		}
 		this.h = this.tfChat.height + 26;
 		this.x = GameCanvas.w / 2 - this.w / 2;
 		this.y = this.tfChat.y - 18;
@@ -47,16 +51,25 @@ public class ChatTextField : IActionListener
 			this.w = 320;
 		}
 		this.left.x = this.x;
+		this.center.x = GameCanvas.w / 2 - 34;
 		this.right.x = this.x + this.w - 68;
 		if (GameCanvas.isTouch)
 		{
 			this.tfChat.y -= 5;
 			this.y -= 20;
 			this.h += 30;
-			this.left.x = GameCanvas.w / 2 - 68 - 5;
-			this.right.x = GameCanvas.w / 2 + 5;
-			this.left.y = GameCanvas.h - 30;
-			this.right.y = GameCanvas.h - 30;
+			int btnW = 68;
+			int gap = (this.w - btnW * 3) / 4;
+			if (gap < 4) gap = 4;
+			this.left.w = btnW;
+			this.center.w = btnW;
+			this.right.w = btnW;
+			this.left.x = this.x + gap;
+			this.center.x = this.left.x + btnW + gap;
+			this.right.x = this.center.x + btnW + gap;
+			this.left.y = this.y + this.h - 32;
+			this.center.y = this.left.y;
+			this.right.y = this.left.y;
 		}
 		this.cmdChat = new Command();
 		ActionChat actionChat = delegate(string str)
@@ -149,6 +162,7 @@ public class ChatTextField : IActionListener
 	// Token: 0x060006D8 RID: 1752 RVA: 0x0005CA04 File Offset: 0x0005AC04
 	public void startChat(IChatable parentScreen, string to)
 	{
+		this.initChatTextField();
 		this.right.caption = mResources.CLOSE;
 		this.to = to;
 		if (Main.isWindowsPhone)
@@ -177,6 +191,7 @@ public class ChatTextField : IActionListener
 	// Token: 0x060006D9 RID: 1753 RVA: 0x0005CAC4 File Offset: 0x0005ACC4
 	public void startChat2(IChatable parentScreen, string to)
 	{
+		this.initChatTextField();
 		this.tfChat.setFocusWithKb(true);
 		this.to = to;
 		this.parentScreen = parentScreen;
@@ -226,6 +241,14 @@ public class ChatTextField : IActionListener
 			this.tfChat.setText(string.Empty);
 			this.right.caption = mResources.CLOSE;
 		}
+		if (GameCanvas.isPointerJustRelease)
+		{
+			if (this.center != null && this.center.isPointerPressInside())
+			{
+				this.center.performAction();
+				GameCanvas.isPointerJustRelease = false;
+			}
+		}
 		if (Main.isPC)
 		{
 			if (GameCanvas.keyPressed[15])
@@ -270,11 +293,8 @@ public class ChatTextField : IActionListener
 		int num2 = (!Main.isWindowsPhone) ? this.x : 0;
 		int num3 = (!Main.isWindowsPhone) ? this.w : GameCanvas.w;
 		PopUp.paintPopUp(g, num2, num, num3, this.h, -1, true);
-		if (Main.isPC)
-		{
-			mFont.tahoma_7b_green2.drawString(g, this.strChat + this.to, this.tfChat.x, this.tfChat.y - ((!GameCanvas.isTouch) ? 12 : 17), 0);
-			GameCanvas.paintz.paintCmdBar(g, this.left, this.center, this.right);
-		}
+		mFont.tahoma_7b_green2.drawString(g, this.strChat + this.to, this.tfChat.x, this.tfChat.y - ((!GameCanvas.isTouch) ? 12 : 17), 0);
+		GameCanvas.paintz.paintCmdBar(g, this.left, this.center, this.right);
 		this.tfChat.paint(g);
 	}
 
@@ -307,6 +327,24 @@ public class ChatTextField : IActionListener
 				this.parentScreen.onCancelChat();
 			}
 			this.tfChat.clear();
+			break;
+		case 8002:
+			string clip = UnityEngine.GUIUtility.systemCopyBuffer;
+			if (!string.IsNullOrEmpty(clip))
+			{
+				clip = clip.Trim();
+				this.tfChat.insertText(clip);
+				if (TField.kb != null)
+				{
+					TField.kb.text = this.tfChat.getText();
+				}
+				this.right.caption = mResources.DELETE;
+				GameScr.info1.addInfo("Đã dán: " + clip, 0);
+			}
+			else
+			{
+				GameScr.info1.addInfo("Clipboard trống!", 0);
+			}
 			break;
 		}
 	}
