@@ -35,42 +35,49 @@ public class ChatTextField : IActionListener
 	// Token: 0x060006D3 RID: 1747 RVA: 0x0005C6DC File Offset: 0x0005A8DC
 	public void initChatTextField()
 	{
-		this.left = new Command(mResources.OK, this, 8000, null, 1, GameCanvas.h - mScreen.cmdH + 1);
-		this.right = new Command(mResources.DELETE, this, 8001, null, GameCanvas.w - 70, GameCanvas.h - mScreen.cmdH + 1);
-		this.center = new Command("Dán", this, 8002, null, GameCanvas.w / 2 - 34, GameCanvas.h - mScreen.cmdH + 1);
-		this.w = this.tfChat.width + 20;
-		if (this.w < 260)
+		this.left = new Command(mResources.OK, this, 8000, null, 1, 1);
+		this.right = new Command(mResources.DELETE, this, 8001, null, 1, 1);
+		this.center = new Command("Dán", this, 8002, null, 1, 1);
+
+		this.w = 260;
+		if (this.w > GameCanvas.w - 10)
 		{
-			this.w = 260;
+			this.w = GameCanvas.w - 10;
 		}
-		this.h = this.tfChat.height + 26;
-		this.x = GameCanvas.w / 2 - this.w / 2;
-		this.y = this.tfChat.y - 18;
-		if (Main.isPC && this.w > 320)
+		this.h = 82;
+		this.x = (GameCanvas.w - this.w) / 2;
+		this.y = GameCanvas.h - this.h - 15;
+		if (this.y < 10)
 		{
-			this.w = 320;
+			this.y = 10;
 		}
-		this.left.x = this.x;
-		this.center.x = GameCanvas.w / 2 - 34;
-		this.right.x = this.x + this.w - 68;
-		if (GameCanvas.isTouch)
-		{
-			this.tfChat.y -= 5;
-			this.y -= 20;
-			this.h += 30;
-			int btnW = 68;
-			int gap = (this.w - btnW * 3) / 4;
-			if (gap < 4) gap = 4;
-			this.left.w = btnW;
-			this.center.w = btnW;
-			this.right.w = btnW;
-			this.left.x = this.x + gap;
-			this.center.x = this.left.x + btnW + gap;
-			this.right.x = this.center.x + btnW + gap;
-			this.left.y = this.y + this.h - 32;
-			this.center.y = this.left.y;
-			this.right.y = this.left.y;
-		}
+
+		this.tfChat.width = this.w - 20;
+		this.tfChat.height = 24;
+		this.tfChat.x = this.x + 10;
+		this.tfChat.y = this.y + 22;
+
+		int btnW = 68;
+		int totalBtnW = btnW * 3;
+		int gap = (this.w - totalBtnW) / 4;
+		if (gap < 4) gap = 4;
+		int btnY = this.y + 50;
+
+		this.left.w = btnW;
+		this.left.h = 24;
+		this.left.x = this.x + gap;
+		this.left.y = btnY;
+
+		this.center.w = btnW;
+		this.center.h = 24;
+		this.center.x = this.left.x + btnW + gap;
+		this.center.y = btnY;
+
+		this.right.w = btnW;
+		this.right.h = 24;
+		this.right.x = this.center.x + btnW + gap;
+		this.right.y = btnY;
+
 		this.cmdChat = new Command();
 		ActionChat actionChat = delegate(string str)
 		{
@@ -289,13 +296,12 @@ public class ChatTextField : IActionListener
 		{
 			return;
 		}
-		int num = (!Main.isWindowsPhone) ? (this.y - this.KC) : (this.tfChat.y - 5);
-		int num2 = (!Main.isWindowsPhone) ? this.x : 0;
-		int num3 = (!Main.isWindowsPhone) ? this.w : GameCanvas.w;
-		PopUp.paintPopUp(g, num2, num, num3, this.h, -1, true);
-		mFont.tahoma_7b_green2.drawString(g, this.strChat + this.to, this.tfChat.x, this.tfChat.y - ((!GameCanvas.isTouch) ? 12 : 17), 0);
-		GameCanvas.paintz.paintCmdBar(g, this.left, this.center, this.right);
+		PopUp.paintPopUp(g, this.x, this.y, this.w, this.h, -1, true);
+		mFont.tahoma_7b_green2.drawString(g, this.strChat + this.to, this.x + 10, this.y + 6, 0);
 		this.tfChat.paint(g);
+		if (this.left != null) this.left.paint(g);
+		if (this.center != null) this.center.paint(g);
+		if (this.right != null) this.right.paint(g);
 	}
 
 	// Token: 0x060006DE RID: 1758 RVA: 0x0005CDAC File Offset: 0x0005AFAC
