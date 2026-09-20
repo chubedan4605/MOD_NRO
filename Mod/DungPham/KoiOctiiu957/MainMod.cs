@@ -131,6 +131,21 @@ namespace Mod.DungPham.KoiOctiiu957
 				global::Char.myCharz().cy.ToString()
 			}), 25, startY, 0);
 			startY += 10;
+
+			List<AutoMap.AdjacentMapInfo> adjMaps = AutoMap.GetAdjacentMaps();
+			if (adjMaps.Count > 0)
+			{
+				mFont.tahoma_7_yellow.drawString(g, "Map liền kề:", 25, startY, 0);
+				startY += 10;
+				for (int i = 0; i < adjMaps.Count; i++)
+				{
+					AutoMap.AdjacentMapInfo info = adjMaps[i];
+					string idStr = (info.MapID >= 0) ? ("[" + info.MapID.ToString() + "] ") : "";
+					string displayStr = " • " + info.KeyName + ": " + idStr + info.MapName + info.GetCoordString();
+					mFont.tahoma_7_white.drawString(g, displayStr, 25, startY, 0);
+					startY += 10;
+				}
+			}
 				
 			int num = startY;
 			if (MainMod.isConnectToAccountManager)
@@ -818,7 +833,7 @@ namespace Mod.DungPham.KoiOctiiu957
 			{
 				if (TileMap.mapID == 21 || TileMap.mapID == 22 || TileMap.mapID == 23)
 				{
-					return;
+					return false;
 				}
 				Service.gI().openUIZone();
 				GameCanvas.panel.setTypeZone();
@@ -992,15 +1007,7 @@ namespace Mod.DungPham.KoiOctiiu957
 		// Token: 0x06000BA6 RID: 2982 RVA: 0x000A53A0 File Offset: 0x000A35A0
 		public static void TeleportTo(int x, int y)
 		{
-			global::Char.myCharz().cx = x;
-			global::Char.myCharz().cy = y;
-			Service.gI().charMove();
-			global::Char.myCharz().cx = x;
-			global::Char.myCharz().cy = y + 1;
-			Service.gI().charMove();
-			global::Char.myCharz().cx = x;
-			global::Char.myCharz().cy = y;
-			Service.gI().charMove();
+			AutoMap.TeleportTo(x, y);
 		}
 
 		// Token: 0x06000BA7 RID: 2983 RVA: 0x000A343C File Offset: 0x000A163C
@@ -2180,40 +2187,6 @@ namespace Mod.DungPham.KoiOctiiu957
 
 		public static void StartPingThread()
 		{
-			if (MainMod.isPingThreadRunning) return;
-			MainMod.isPingThreadRunning = true;
-			new Thread(() => {
-				while (true)
-				{
-					try
-					{
-						if (!string.IsNullOrEmpty(MainMod.serverHost) && Session_ME.connected)
-						{
-							Stopwatch sw = new Stopwatch();
-							sw.Start();
-							using (TcpClient client = new TcpClient())
-							{
-								var result = client.BeginConnect(MainMod.serverHost, MainMod.serverPort, null, null);
-								bool success = result.AsyncWaitHandle.WaitOne(1000);
-								if (success)
-								{
-									client.EndConnect(result);
-									sw.Stop();
-									MainMod.ping = (int)sw.ElapsedMilliseconds;
-								}
-								else
-								{
-									MainMod.ping = -1;
-								}
-							}
-						}
-					}
-					catch {
-						MainMod.ping = -2;
-					}
-					Thread.Sleep(2000);
-				}
-			}).Start();
 		}
 		public static string[] inputFPS = new string[] { "Nhập mức FPS mong muốn", "FPS" };
 

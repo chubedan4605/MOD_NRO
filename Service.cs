@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Assets.src.g;
 using Mod.DungPham.KoiOctiiu957;
 
@@ -905,9 +905,7 @@ public class Service
 		{
 			"Login ",
 			username,
-			" ",
-			pass,
-			" ",
+			" *** ",
 			version
 		}));
 		try
@@ -956,7 +954,7 @@ public class Service
 			return;
 		}
 		global::Char.isLoadingMap = true;
-		GameCanvas.timeLoading = 15;
+		GameCanvas.timeLoading = 0;
 		GameCanvas.TIMEOUT = mSystem.currentTimeMillis();
 		Message message = new Message(-23);
 		this.session.sendMessage(message);
@@ -985,7 +983,7 @@ public class Service
 		try
 		{
 			global::Char.isLoadingMap = true;
-			GameCanvas.timeLoading = 15;
+			GameCanvas.timeLoading = 0;
 			GameCanvas.TIMEOUT = mSystem.currentTimeMillis();
 			message.writer().writeByte(zoneId);
 			this.session.sendMessage(message);
@@ -2582,7 +2580,7 @@ public class Service
 		try
 		{
 			global::Char.isLoadingMap = true;
-			GameCanvas.timeLoading = 15;
+			GameCanvas.timeLoading = 0;
 			GameCanvas.TIMEOUT = mSystem.currentTimeMillis();
 			message = new Message(-33);
 			this.session.sendMessage(message);
@@ -3006,7 +3004,7 @@ public class Service
 		Message message = null;
 		try
 		{
-			Res.outz("------------setLockInventory:     " + pass);
+			Res.outz("------------setLockInventory:     ***");
 			message = new Message(-104);
 			message.writer().writeInt(pass);
 			this.session.sendMessage(message);

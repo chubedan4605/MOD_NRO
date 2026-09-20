@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
@@ -48,7 +48,6 @@ public class Session_ME : ISession
 	{
 		Mod.DungPham.KoiOctiiu957.MainMod.serverHost = host;
 		Mod.DungPham.KoiOctiiu957.MainMod.serverPort = port;
-		Mod.DungPham.KoiOctiiu957.MainMod.StartPingThread();
 		if (Session_ME.connected || Session_ME.connecting)
 		{
 			Debug.Log(string.Concat(new object[]
@@ -95,6 +94,7 @@ public class Session_ME : ISession
 		}
 		catch (Exception ex)
 		{
+			Debug.LogError(">>>NetworkInit Exception: " + ex);
 			if (Session_ME.messageHandler != null)
 			{
 				this.close();
@@ -106,8 +106,15 @@ public class Session_ME : ISession
 	// Token: 0x0600015D RID: 349 RVA: 0x0000E920 File Offset: 0x0000CB20
 	public void doConnect(string host, int port)
 	{
-		Session_ME.sc = new TcpClient();
-		Session_ME.sc.Connect(host, port);
+		TcpClient client = new TcpClient();
+		client.NoDelay = true;
+		client.Connect(host, port);
+		if (!Session_ME.connecting || !Session_ME.connected)
+		{
+			client.Close();
+			return;
+		}
+		Session_ME.sc = client;
 		Session_ME.dataStream = Session_ME.sc.GetStream();
 		Session_ME.dis = new BinaryReader(Session_ME.dataStream, new UTF8Encoding());
 		Session_ME.dos = new BinaryWriter(Session_ME.dataStream, new UTF8Encoding());
@@ -126,7 +133,10 @@ public class Session_ME : ISession
 	public void sendMessage(Message message)
 	{
 		Session_ME.count++;
-		Res.outz("SEND MSG: " + message.command);
+		if (message.command != -120 && message.command != -121 && message.command != -7)
+		{
+			Res.outz("SEND MSG: " + message.command);
+		}
 		Session_ME.sender.AddMessage(message);
 	}
 
@@ -134,6 +144,11 @@ public class Session_ME : ISession
 	private static void doSendMessage(Message m)
 	{
 		sbyte[] data = m.getData();
+		if (m.command != -120 && m.command != -121 && m.command != -7)
+		{
+			Debug.Log("[NET SEND] cmd=" + m.command + " | size=" + ((data != null) ? data.Length : 0));
+		}
+		Session_ME.lastSendTime = mSystem.currentTimeMillis();
 		try
 		{
 			if (Session_ME.getKeyComplete)
@@ -181,7 +196,7 @@ public class Session_ME : ISession
 				}
 				else
 				{
-					Session_ME.dos.Write(0);
+					Session_ME.dos.Write((ushort)0);
 				}
 				Session_ME.sendByteCount += 5;
 			}
@@ -426,6 +441,7 @@ public class Session_ME : ISession
 
 	// Token: 0x0400013B RID: 315
 	private static int timeConnected;
+	public static long lastSendTime;
 
 	// Token: 0x0400013C RID: 316
 	private long lastTimeConn;
@@ -517,6 +533,19 @@ public class Session_ME : ISession
 					{
 						break;
 					}
+					if (Session_ME.lastSendTime > 0L)
+					{
+						long numRtt = mSystem.currentTimeMillis() - Session_ME.lastSendTime;
+						if (numRtt >= 0L && numRtt < 5000L)
+						{
+							Mod.DungPham.KoiOctiiu957.MainMod.ping = (int)numRtt;
+						}
+					}
+					sbyte[] recvData = message.getData();
+					if (message.command != -120 && message.command != -121 && message.command != -7)
+					{
+						Debug.Log("[NET RECV] cmd=" + message.command + " | size=" + ((recvData != null) ? recvData.Length : 0));
+					}
 					try
 					{
 						if ((int)message.command == -27)
@@ -545,7 +574,7 @@ public class Session_ME : ISession
 			catch (Exception ex)
 			{
 				Debug.Log("error read message!");
-				Debug.Log(ex.Message.ToString());
+				Debug.Log((ex != null) ? ex.ToString() : "unknown error");
 			}
 			if (Session_ME.connected)
 			{
@@ -601,30 +630,46 @@ public class Session_ME : ISession
 		// Token: 0x06000171 RID: 369 RVA: 0x0000F0D0 File Offset: 0x0000D2D0
 		private Message readMessage2(sbyte cmd)
 		{
-			int num = (int)Session_ME.readKey(Session_ME.dis.ReadSByte()) + 128;
-			int num2 = (int)Session_ME.readKey(Session_ME.dis.ReadSByte()) + 128;
-			int num3 = (int)Session_ME.readKey(Session_ME.dis.ReadSByte()) + 128;
-			int num4 = (num3 * 256 + num2) * 256 + num;
-			sbyte[] array = new sbyte[num4];
-			byte[] src = Session_ME.dis.ReadBytes(num4);
-			Buffer.BlockCopy(src, 0, array, 0, num4);
-			Session_ME.recvByteCount += 5 + num4;
-			int num5 = Session_ME.recvByteCount + Session_ME.sendByteCount;
-			Session_ME.strRecvByteCount = string.Concat(new object[]
+			try
 			{
-				num5 / 1024,
-				".",
-				num5 % 1024 / 102,
-				"Kb"
-			});
-			if (Session_ME.getKeyComplete)
-			{
-				for (int i = 0; i < array.Length; i++)
+				BinaryReader reader = Session_ME.dis;
+				if (reader == null || !Session_ME.connected)
 				{
-					array[i] = Session_ME.readKey(array[i]);
+					return null;
+				}
+				int num = (int)Session_ME.readKey(reader.ReadSByte()) + 128;
+				int num2 = (int)Session_ME.readKey(reader.ReadSByte()) + 128;
+				int num3 = (int)Session_ME.readKey(reader.ReadSByte()) + 128;
+				int num4 = (num3 * 256 + num2) * 256 + num;
+				sbyte[] array = new sbyte[num4];
+				byte[] src = reader.ReadBytes(num4);
+				Buffer.BlockCopy(src, 0, array, 0, num4);
+				Session_ME.recvByteCount += 5 + num4;
+				int num5 = Session_ME.recvByteCount + Session_ME.sendByteCount;
+				Session_ME.strRecvByteCount = string.Concat(new object[]
+				{
+					num5 / 1024,
+					".",
+					num5 % 1024 / 102,
+					"Kb"
+				});
+				if (Session_ME.getKeyComplete)
+				{
+					for (int i = 0; i < array.Length; i++)
+					{
+						array[i] = Session_ME.readKey(array[i]);
+					}
+				}
+				return new Message(cmd, array);
+			}
+			catch (Exception ex)
+			{
+				if (Session_ME.connected)
+				{
+					Debug.Log("[readMessage2 error] " + ((ex != null) ? ex.Message : ""));
 				}
 			}
-			return new Message(cmd, array);
+			return null;
 		}
 
 		// Token: 0x06000172 RID: 370 RVA: 0x0000F1F4 File Offset: 0x0000D3F4
@@ -632,7 +677,12 @@ public class Session_ME : ISession
 		{
 			try
 			{
-				sbyte b = Session_ME.dis.ReadSByte();
+				BinaryReader reader = Session_ME.dis;
+				if (reader == null || !Session_ME.connected)
+				{
+					return null;
+				}
+				sbyte b = reader.ReadSByte();
 				if (Session_ME.getKeyComplete)
 				{
 					b = Session_ME.readKey(b);
@@ -644,18 +694,18 @@ public class Session_ME : ISession
 				int num;
 				if (Session_ME.getKeyComplete)
 				{
-					sbyte b2 = Session_ME.dis.ReadSByte();
-					sbyte b3 = Session_ME.dis.ReadSByte();
+					sbyte b2 = reader.ReadSByte();
+					sbyte b3 = reader.ReadSByte();
 					num = (((int)Session_ME.readKey(b2) & 255) << 8 | ((int)Session_ME.readKey(b3) & 255));
 				}
 				else
 				{
-					sbyte b4 = Session_ME.dis.ReadSByte();
-					sbyte b5 = Session_ME.dis.ReadSByte();
+					sbyte b4 = reader.ReadSByte();
+					sbyte b5 = reader.ReadSByte();
 					num = (((int)b4 & 65280) | ((int)b5 & 255));
 				}
 				sbyte[] array = new sbyte[num];
-				byte[] src = Session_ME.dis.ReadBytes(num);
+				byte[] src = reader.ReadBytes(num);
 				Buffer.BlockCopy(src, 0, array, 0, num);
 				Session_ME.recvByteCount += 5 + num;
 				int num2 = Session_ME.recvByteCount + Session_ME.sendByteCount;
@@ -677,7 +727,10 @@ public class Session_ME : ISession
 			}
 			catch (Exception ex)
 			{
-				Debug.Log(ex.StackTrace.ToString());
+				if (Session_ME.connected)
+				{
+					Debug.Log("[readMessage error] " + ((ex != null) ? ex.Message : ""));
+				}
 			}
 			return null;
 		}

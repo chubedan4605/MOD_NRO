@@ -543,6 +543,7 @@ public class Panel : IActionListener, IChatable
 	// Token: 0x060008CC RID: 2252 RVA: 0x0007B524 File Offset: 0x00079724
 	public void setTypeBox()
 	{
+		Debug.Log("[PANEL] Switch to Rương đồ (Chest)");
 		this.type = 2;
 		if (GameCanvas.w > 2 * Panel.WIDTH_PANEL)
 		{
@@ -737,6 +738,7 @@ public class Panel : IActionListener, IChatable
 	// Token: 0x060008D2 RID: 2258 RVA: 0x0007B97C File Offset: 0x00079B7C
 	public void setTypeMain()
 	{
+		Debug.Log("[PANEL] Switch to Hành trang (Inventory)");
 		this.type = 0;
 		this.setType(0);
 		if (this.currentTabIndex == 1)
@@ -1398,6 +1400,8 @@ public class Panel : IActionListener, IChatable
 		this.timeShow = 20;
 		this.isShow = true;
 		this.isClose = false;
+		string panelName = (this.type == 0) ? "Hành trang (Inventory)" : ((this.type == 2) ? "Rương đồ (Chest)" : ("Type " + this.type));
+		Debug.Log("[PANEL OPEN] " + panelName);
 		SoundMn.gI().panelOpen();
 		if (this.isTypeShop())
 		{
@@ -6865,6 +6869,7 @@ public class Panel : IActionListener, IChatable
 	// Token: 0x06000941 RID: 2369 RVA: 0x000899B8 File Offset: 0x00087BB8
 	public void hide()
 	{
+		Debug.Log("[PANEL CLOSE] type=" + this.type);
 		Panel.isOpeningPet = false;
 		if (this.timeShow > 0)
 		{
@@ -9273,7 +9278,7 @@ public class Panel : IActionListener, IChatable
 			Item[] arrItemBody2 = global::Char.myCharz().arrItemBody;
 			bool flag3 = this.selected < arrItemBody2.Length;
 			sbyte index = (sbyte)(flag3 ? this.selected : (this.selected - arrItemBody2.Length));
-			Service.gI().useItem(0, flag3 ? 0 : 1, index, -1);
+			Service.gI().useItem(0, (sbyte)(flag3 ? 0 : 1), index, -1);
 			if (item7.template.id == 193 || item7.template.id == 194)
 			{
 				GameCanvas.panel.hide();
@@ -9289,7 +9294,7 @@ public class Panel : IActionListener, IChatable
 			Item[] arrItemBody3 = global::Char.myCharz().arrItemBody;
 			bool flag4 = this.selected < arrItemBody3.Length;
 			sbyte index2 = (sbyte)(flag4 ? this.selected : (this.selected - arrItemBody3.Length));
-			Service.gI().useItem(1, flag4 ? 0 : 1, index2, -1);
+			Service.gI().useItem(1, (sbyte)(flag4 ? 0 : 1), index2, -1);
 		}
 		if (idAction == 2004)
 		{
@@ -9297,7 +9302,7 @@ public class Panel : IActionListener, IChatable
 			ItemObject itemObject = (ItemObject)p;
 			sbyte where2 = (sbyte)itemObject.where;
 			sbyte index3 = (sbyte)itemObject.id;
-			Service.gI().useItem((itemObject.type != 0) ? 2 : 3, where2, index3, -1);
+			Service.gI().useItem((sbyte)((itemObject.type != 0) ? 2 : 3), where2, index3, -1);
 		}
 		if (idAction == 2005)
 		{
@@ -9343,7 +9348,7 @@ public class Panel : IActionListener, IChatable
 			Item[] arrItemBody4 = global::Char.myCharz().arrItemBody;
 			bool flag5 = this.selected < arrItemBody4.Length;
 			short id5 = (short)(flag5 ? this.selected : (this.selected - arrItemBody4.Length));
-			Service.gI().saleItem(0, flag5 ? 0 : 1, id5);
+			Service.gI().saleItem(0, (sbyte)(flag5 ? 0 : 1), id5);
 		}
 		if (idAction == 3003)
 		{

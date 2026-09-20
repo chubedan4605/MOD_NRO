@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 // Token: 0x020000C3 RID: 195
@@ -147,28 +147,19 @@ public class Res
 	// Token: 0x060009D1 RID: 2513 RVA: 0x0000873C File Offset: 0x0000693C
 	public static void outz(string s)
 	{
-		if (mSystem.isTest)
-		{
-			Debug.Log(s);
-		}
+		Debug.Log(s);
 	}
 
 	// Token: 0x060009D2 RID: 2514 RVA: 0x0000874B File Offset: 0x0000694B
 	public static void outz(string s, int logIndex)
 	{
-		if (mSystem.isTest)
-		{
-			Debug.Log(Res.LOG_CAT[logIndex] + s);
-		}
+		Debug.Log(Res.LOG_CAT[logIndex] + s);
 	}
 
 	// Token: 0x060009D3 RID: 2515 RVA: 0x00008766 File Offset: 0x00006966
 	public static void err(string s)
 	{
-		if (mSystem.isTest)
-		{
-			Debug.LogError(s);
-		}
+		Debug.LogError(s);
 	}
 
 	// Token: 0x060009D4 RID: 2516 RVA: 0x000045ED File Offset: 0x000027ED

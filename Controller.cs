@@ -88,14 +88,14 @@ public class Controller : IMessageHandler
 		GameCanvas.debug("SA1", 2);
 		try
 		{
-			if (msg.command != -74)
+			if (msg.command != -74 && msg.command != -120 && msg.command != -121)
 			{
 				Res.outz("=========> [READ] cmd= " + msg.command);
 			}
 			global::Char @char = null;
 			MyVector myVector = new MyVector();
 			int i = 0;
-			GameCanvas.timeLoading = 15;
+			GameCanvas.timeLoading = 0;
 			Controller2.readMessage(msg);
 			sbyte b = msg.command;
 			switch (b)
@@ -2937,6 +2937,7 @@ public class Controller : IMessageHandler
 				GameCanvas.debug("SA75", 2);
 				GameScr.resetAllvector();
 				GameCanvas.endDlg();
+				AutoMap.isAutoChangeMap = false;
 				TileMap.vGo.removeAllElements();
 				PopUp.vPopups.removeAllElements();
 				TileMap.mapID = (int)msg.reader().readUnsignedByte();

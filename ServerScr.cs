@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 // Token: 0x020000C7 RID: 199
 public class ServerScr : mScreen, IActionListener
@@ -271,14 +271,13 @@ public class ServerScr : mScreen, IActionListener
 		default:
 			if (idAction != 999)
 			{
-				Session_ME.gI().close();
 				ServerListScreen.SetIpSelect(idAction - 100, true);
-				ServerListScreen.ConnectIP();
 				if (GameCanvas.serverScreen == null)
 				{
 					GameCanvas.serverScreen = new ServerListScreen();
 				}
 				GameCanvas.serverScreen.selectServer();
+				ServerListScreen.ConnectIP();
 				GameCanvas.serverScreen.switchToMe();
 			}
 			else

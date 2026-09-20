@@ -591,7 +591,7 @@ public class mSystem
 	}
 
 	// Token: 0x040000EC RID: 236
-	public static bool isTest;
+	public static bool isTest = true;
 
 	// Token: 0x040000ED RID: 237
 	public static string strAdmob;

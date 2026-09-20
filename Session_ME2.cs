@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
@@ -91,8 +91,15 @@ public class Session_ME2 : ISession
 	// Token: 0x0600017A RID: 378 RVA: 0x0000F518 File Offset: 0x0000D718
 	public void doConnect(string host, int port)
 	{
-		Session_ME2.sc = new TcpClient();
-		Session_ME2.sc.Connect(host, port);
+		TcpClient client = new TcpClient();
+		client.NoDelay = true;
+		client.Connect(host, port);
+		if (!Session_ME2.connecting || !Session_ME2.connected)
+		{
+			client.Close();
+			return;
+		}
+		Session_ME2.sc = client;
 		Session_ME2.dataStream = Session_ME2.sc.GetStream();
 		Session_ME2.dis = new BinaryReader(Session_ME2.dataStream, new UTF8Encoding());
 		Session_ME2.dos = new BinaryWriter(Session_ME2.dataStream, new UTF8Encoding());
@@ -110,7 +117,10 @@ public class Session_ME2 : ISession
 	// Token: 0x0600017B RID: 379 RVA: 0x00004EFD File Offset: 0x000030FD
 	public void sendMessage(Message message)
 	{
-		Res.outz("SEND MSG: " + message.command);
+		if (message.command != -120 && message.command != -121)
+		{
+			Res.outz("SEND MSG: " + message.command);
+		}
 		Session_ME2.sender.AddMessage(message);
 	}
 
@@ -118,6 +128,10 @@ public class Session_ME2 : ISession
 	private static void doSendMessage(Message m)
 	{
 		sbyte[] data = m.getData();
+		if (m.command != -120 && m.command != -121)
+		{
+			Debug.Log("[NET2 SEND] cmd=" + m.command + " | size=" + ((data != null) ? data.Length : 0));
+		}
 		try
 		{
 			if (Session_ME2.getKeyComplete)
@@ -165,7 +179,7 @@ public class Session_ME2 : ISession
 				}
 				else
 				{
-					Session_ME2.dos.Write(0);
+					Session_ME2.dos.Write((ushort)0);
 				}
 				Session_ME2.sendByteCount += 5;
 			}
@@ -463,6 +477,11 @@ public class Session_ME2 : ISession
 					{
 						break;
 					}
+					sbyte[] recvData = message.getData();
+					if (message.command != -120 && message.command != -121)
+					{
+						Debug.Log("[NET2 RECV] cmd=" + message.command + " | size=" + ((recvData != null) ? recvData.Length : 0));
+					}
 					try
 					{
 						if ((int)message.command == -27)
@@ -491,7 +510,7 @@ public class Session_ME2 : ISession
 			catch (Exception ex)
 			{
 				Debug.Log("error read message!");
-				Debug.Log(ex.Message.ToString());
+				Debug.Log((ex != null) ? ex.ToString() : "unknown error");
 			}
 			if (Session_ME2.connected)
 			{
@@ -624,7 +643,10 @@ public class Session_ME2 : ISession
 			}
 			catch (Exception ex)
 			{
-				Debug.Log(ex.StackTrace.ToString());
+				if (Session_ME2.connected)
+				{
+					Debug.Log("[readMessage error] " + ((ex != null) ? ex.Message : ""));
+				}
 			}
 			return null;
 		}

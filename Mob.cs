@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using Assets.src.g;
+using Mod.DungPham.KoiOctiiu957;
 
 // Token: 0x020000B8 RID: 184
 public class Mob : IMapObject

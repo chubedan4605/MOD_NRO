@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -384,8 +384,15 @@ public class mFont
 		this.drawString(g, st, x, y, align);
 	}
 
+	public static void paintDamageWhite(mGraphics g, string st, int x, int y, int align, int idFont)
+	{
+		mFont.tahoma_7_white.drawStringWithOutline(g, st, x, y, align);
+	}
 
-
+	public static void paintDamageYellow(mGraphics g, string st, int x, int y, int align, int idFont)
+	{
+		mFont.tahoma_7_yellow.drawStringWithOutline(g, st, x, y, align);
+	}
 	// Token: 0x0600019C RID: 412 RVA: 0x00010BB4 File Offset: 0x0000EDB4
 	public void drawString(mGraphics g, string st, int x, int y, int align, mFont font)
 	{
@@ -566,15 +573,13 @@ public class mFont
 								continue;
 							}
 						}
-						IL_E3:
-						if (num2 == num)
-						{
-							num2 = num3;
-							goto IL_ED;
-						}
-						goto IL_ED;
+						break;
 					}
-					goto IL_E3;
+					if (num2 == num)
+					{
+						num2 = num3;
+					}
+					goto IL_ED;
 				}
 				IL_ED:
 				string text2 = src.Substring(num, num2 + 1 - num);

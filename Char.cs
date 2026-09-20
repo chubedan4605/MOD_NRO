@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Assets.src.e;
 using Assets.src.g;
 using UnityEngine;
@@ -3822,7 +3822,7 @@ public class Char : IMapObject
 			{
 				if (array[i].template.part >= 0)
 				{
-					num = global::Char.ID_NEW_MOUNT + array[i].template.part;
+					num = (short)(global::Char.ID_NEW_MOUNT + array[i].template.part);
 				}
 				else
 				{
@@ -4818,7 +4818,7 @@ public class Char : IMapObject
 	}
 
 	// Token: 0x06000673 RID: 1651 RVA: 0x00056124 File Offset: 0x00054324
-	private void paintEffect(mGraphics g)
+	public void paintEffect(mGraphics g)
 	{
 		if (this.effPaints != null)
 		{
@@ -5021,43 +5021,43 @@ public class Char : IMapObject
 				}
 			}
 			num += mFont.tahoma_7_white.getHeight();
-			mFont mFont = mFont.tahoma_7_whiteSmall;
+			mFont font = mFont.tahoma_7_whiteSmall;
 			if (this.isPet || this.isMiniPet)
 			{
-				mFont = mFont.tahoma_7_blue1Small;
+				font = mFont.tahoma_7_blue1Small;
 			}
 			else if (flag2)
 			{
-				mFont = mFont.nameFontRed;
+				font = mFont.nameFontRed;
 			}
 			else if (flag3)
 			{
-				mFont = mFont.nameFontYellow;
+				font = mFont.nameFontYellow;
 			}
 			else if (flag)
 			{
-				mFont = mFont.nameFontGreen;
+				font = mFont.nameFontGreen;
 			}
 			if (TileMap.mapID == 170)
 			{
 				if (this.flagImage == 2325)
 				{
-					mFont = mFont.tahoma_7_blue;
+					font = mFont.tahoma_7_blue;
 				}
 				else if (this.flagImage == 2323)
 				{
-					mFont = mFont.tahoma_7_red;
+					font = mFont.tahoma_7_red;
 				}
 			}
 			if ((this.paintName || flag2 || flag3) && !flag)
 			{
 				if (mSystem.clientType == 1)
 				{
-					mFont.drawString(g, this.cName, this.cx, this.cy - num, mFont.CENTER, mFont.tahoma_7_greySmall);
+					font.drawString(g, this.cName, this.cx, this.cy - num, mFont.CENTER, mFont.tahoma_7_greySmall);
 				}
 				else
 				{
-					mFont.drawString(g, this.cName, this.cx, this.cy - num, mFont.CENTER);
+					font.drawString(g, this.cName, this.cx, this.cy - num, mFont.CENTER);
 				}
 				num += mFont.tahoma_7.getHeight();
 			}
@@ -5065,11 +5065,11 @@ public class Char : IMapObject
 			{
 				if (global::Char.myCharz().charFocus != null && global::Char.myCharz().charFocus.Equals(this))
 				{
-					mFont.drawString(g, this.cName, this.cx, this.cy - num, mFont.CENTER, mFont.tahoma_7_greySmall);
+					font.drawString(g, this.cName, this.cx, this.cy - num, mFont.CENTER, mFont.tahoma_7_greySmall);
 				}
 				else if (this.charFocus == null)
 				{
-					mFont.drawString(g, this.cName, this.cx - 10, this.cy - num + 3, mFont.LEFT, mFont.tahoma_7_grey);
+					font.drawString(g, this.cName, this.cx - 10, this.cy - num + 3, mFont.LEFT, mFont.tahoma_7_grey);
 					this.paintHp(g, this.cx - 16, this.cy - num + 10);
 				}
 			}

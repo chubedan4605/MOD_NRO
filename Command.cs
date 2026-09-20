@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using UnityEngine;
 
 // Token: 0x02000053 RID: 83
 public class Command
@@ -65,6 +66,7 @@ public class Command
 	public void performAction()
 	{
 		GameCanvas.clearAllPointerEvent();
+		Debug.Log("[BUTTON CLICK] idAction=" + this.idAction + ", caption=\"" + (this.caption ?? string.Empty) + "\"");
 		if (this.isPlaySoundButton && ((this.caption != null && !this.caption.Equals(string.Empty) && !this.caption.Equals(mResources.saying)) || this.img != null))
 		{
 			SoundMn.gI().buttonClick();

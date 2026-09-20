@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -34,10 +34,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System">
-      <HintPath>..\Doc\MOD_NRO_247\DragonBoy247_Data\Managed\System.dll</HintPath>
+      <HintPath>..\DragonBoy250_pc\DragonBoy250_Data\Managed\System.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\Doc\MOD_NRO_247\DragonBoy247_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\DragonBoy250_pc\DragonBoy250_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -177,6 +177,7 @@
     <Compile Include="Mod\DungPham\KoiOctiiu957\Boss.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\Hotkeys.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\MainMod.cs" />
+    <Compile Include="Mod\DungPham\KoiOctiiu957\VietnameseTelex.cs" />
     <Compile Include="MoneyCharge.cs" />
     <Compile Include="MonsterDart.cs" />
     <Compile Include="MotherCanvas.cs" />

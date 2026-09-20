@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 // Token: 0x02000024 RID: 36
 public class Message
@@ -33,7 +33,15 @@ public class Message
 	// Token: 0x06000151 RID: 337 RVA: 0x00004D40 File Offset: 0x00002F40
 	public sbyte[] getData()
 	{
-		return this.dos.getData();
+		if (this.dos != null)
+		{
+			return this.dos.getData();
+		}
+		if (this.dis != null)
+		{
+			return this.dis.buffer;
+		}
+		return null;
 	}
 
 	// Token: 0x06000152 RID: 338 RVA: 0x00004D4D File Offset: 0x00002F4D

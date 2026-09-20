@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -215,7 +215,7 @@ namespace Mod.DungPham.KoiOctiiu957
 					GameScr.info1.addInfo("Không Tìm Thấy Item!", 0);
 					return;
 				}
-				Service.gI().saleItem(0, 1, index + 3);
+				Service.gI().saleItem(0, 1, (short)(index + 3));
 				Thread.Sleep(100);
 				Service.gI().saleItem(1, 1, index);
 				Thread.Sleep(1000);
@@ -234,7 +234,7 @@ namespace Mod.DungPham.KoiOctiiu957
 		{
 			while (item.Quantity > 0 && !GameScr.gI().isBagFull())
 			{
-				Service.gI().buyItem((!item.IsGold) ? 1 : 0, item.Id, 0);
+				Service.gI().buyItem((sbyte)((!item.IsGold) ? 1 : 0), item.Id, 0);
 				item.Quantity--;
 				Thread.Sleep(1000);
 			}

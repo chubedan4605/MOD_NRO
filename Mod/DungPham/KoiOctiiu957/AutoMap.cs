@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 
 namespace Mod.DungPham.KoiOctiiu957
 {
@@ -146,6 +147,15 @@ namespace Mod.DungPham.KoiOctiiu957
 				AutoMap.IdMapEnd = (int)p;
 				GameScr.info1.addInfo("Go to " + TileMap.mapNames[AutoMap.IdMapEnd], 0);
 				return;
+			case 8:
+				AutoMap.ShowAdjacentMapsMenu();
+				return;
+			case 888:
+				if (p is AutoMap.AdjacentMapInfo info)
+				{
+					info.GotoMap();
+				}
+				return;
 			default:
 				return;
 			}
@@ -157,6 +167,7 @@ namespace Mod.DungPham.KoiOctiiu957
 			AutoMap.LoadData();
 			MyVector myVector = new MyVector();
 			myVector.addElement(new Command("Load Map", AutoMap.getInstance(), 1, null));
+			myVector.addElement(new Command("Map Liền Kề", AutoMap.getInstance(), 8, null));
 			myVector.addElement(new Command("Ăn Đùi Gà\n" + (AutoMap.isEatChicken ? "[STATUS: ON]" : "[STATUS: OFF]"), AutoMap.getInstance(), 2, null));
 			myVector.addElement(new Command("Thu Đậu\n" + (AutoMap.isHarvestPean ? "[STATUS: ON]" : "[STATUS: OFF]"), AutoMap.getInstance(), 3, null));
 			myVector.addElement(new Command("Sử Dụng Capsule\n" + (AutoMap.isUseCapsule ? "[STATUS: ON]" : "[STATUS: OFF]"), AutoMap.getInstance(), 4, null));
@@ -187,6 +198,202 @@ namespace Mod.DungPham.KoiOctiiu957
 				}
 			}
 			GameCanvas.menu.startAt(myVector, 3);
+		}
+
+		public class AdjacentMapInfo
+		{
+			public string KeyName;
+			public int MapID = -1;
+			public string MapName = "";
+			public int Position = -1;
+			public Waypoint Waypoint;
+			public AutoMap.NextMap NextMap;
+
+			public string GetCoordString()
+			{
+				if (this.Waypoint != null)
+				{
+					int wpX = (int)(this.Waypoint.minX + this.Waypoint.maxX) / 2;
+					int wpY = (int)(this.Waypoint.minY + this.Waypoint.maxY) / 2;
+					return string.Format(" ({0}, {1})", wpX, wpY);
+				}
+				return "";
+			}
+
+			public void GotoMap()
+			{
+				if (this.NextMap != null)
+				{
+					this.NextMap.GotoMap();
+				}
+				else if (this.Position >= 0)
+				{
+					AutoMap.LoadMap(this.Position);
+				}
+				else if (this.Waypoint != null)
+				{
+					AutoMap.EnterWaypointDirect(this.Waypoint);
+				}
+			}
+		}
+
+		public static List<AutoMap.AdjacentMapInfo> GetAdjacentMaps()
+		{
+			List<AutoMap.AdjacentMapInfo> list = new List<AutoMap.AdjacentMapInfo>();
+			if (TileMap.vGo != null && TileMap.vGo.size() > 0)
+			{
+				List<Waypoint> list2 = new List<Waypoint>();
+				for (int i = 0; i < TileMap.vGo.size(); i++)
+				{
+					Waypoint waypoint = (Waypoint)TileMap.vGo.elementAt(i);
+					if (waypoint != null)
+					{
+						list2.Add(waypoint);
+					}
+				}
+				if (list2.Count > 0)
+				{
+					list2.Sort((Waypoint w1, Waypoint w2) => ((int)(w1.minX + w1.maxX)).CompareTo((int)(w2.minX + w2.maxX)));
+					list.Add(AutoMap.CreateAdjacentMapInfo("Trái (J)", 0, list2[0]));
+					if (list2.Count >= 2)
+					{
+						list.Add(AutoMap.CreateAdjacentMapInfo("Phải (L)", 1, list2[list2.Count - 1]));
+					}
+					if (list2.Count >= 3)
+					{
+						list.Add(AutoMap.CreateAdjacentMapInfo("Giữa (K)", 2, list2[list2.Count / 2]));
+					}
+				}
+			}
+			if (AutoMap.linkMaps != null && AutoMap.linkMaps.ContainsKey(TileMap.mapID))
+			{
+				List<AutoMap.NextMap> list3 = AutoMap.linkMaps[TileMap.mapID];
+				if (list3 != null)
+				{
+					foreach (AutoMap.NextMap nextMap in list3)
+					{
+						if (nextMap != null && nextMap.Npc != -1)
+						{
+							AutoMap.AdjacentMapInfo adjacentMapInfo = new AutoMap.AdjacentMapInfo();
+							string text = "NPC";
+							if (Npc.arrNpcTemplate != null && nextMap.Npc >= 0 && nextMap.Npc < Npc.arrNpcTemplate.Length && Npc.arrNpcTemplate[nextMap.Npc] != null)
+							{
+								text = "NPC " + Npc.arrNpcTemplate[nextMap.Npc].name;
+							}
+							adjacentMapInfo.KeyName = text;
+							adjacentMapInfo.MapID = nextMap.MapID;
+							adjacentMapInfo.MapName = ((TileMap.mapNames != null && nextMap.MapID >= 0 && nextMap.MapID < TileMap.mapNames.Length) ? TileMap.mapNames[nextMap.MapID] : ("Map " + nextMap.MapID.ToString()));
+							adjacentMapInfo.Position = -1;
+							adjacentMapInfo.NextMap = nextMap;
+							list.Add(adjacentMapInfo);
+						}
+					}
+				}
+			}
+			return list;
+		}
+
+		private static AutoMap.AdjacentMapInfo CreateAdjacentMapInfo(string keyName, int pos, Waypoint wp)
+		{
+			AutoMap.AdjacentMapInfo adjacentMapInfo = new AutoMap.AdjacentMapInfo();
+			adjacentMapInfo.KeyName = keyName;
+			adjacentMapInfo.Position = pos;
+			adjacentMapInfo.Waypoint = wp;
+			string text = "";
+			if (wp != null && wp.popup != null && wp.popup.says != null)
+			{
+				StringBuilder stringBuilder = new StringBuilder();
+				for (int i = 0; i < wp.popup.says.Length; i++)
+				{
+					stringBuilder.Append(wp.popup.says[i]).Append(" ");
+				}
+				text = stringBuilder.ToString().Trim();
+			}
+			adjacentMapInfo.MapName = text;
+			adjacentMapInfo.MapID = AutoMap.GetMapIDByName(text);
+			return adjacentMapInfo;
+		}
+
+		public static int GetMapIDByName(string mapName)
+		{
+			if (string.IsNullOrEmpty(mapName) || TileMap.mapNames == null)
+			{
+				return -1;
+			}
+			for (int i = 0; i < TileMap.mapNames.Length; i++)
+			{
+				if (TileMap.mapNames[i] != null && TileMap.mapNames[i].Equals(mapName, StringComparison.OrdinalIgnoreCase))
+				{
+					return i;
+				}
+			}
+			return -1;
+		}
+
+		public static void ShowAdjacentMapsMenu()
+		{
+			List<AutoMap.AdjacentMapInfo> adjacentMaps = AutoMap.GetAdjacentMaps();
+			if (adjacentMaps.Count == 0)
+			{
+				GameScr.info1.addInfo("Không có map liền kề nào!", 0);
+				return;
+			}
+			MyVector myVector = new MyVector();
+			for (int i = 0; i < adjacentMaps.Count; i++)
+			{
+				AutoMap.AdjacentMapInfo adjacentMapInfo = adjacentMaps[i];
+				string text = (adjacentMapInfo.MapID >= 0) ? ("[" + adjacentMapInfo.MapID.ToString() + "] ") : "";
+				string caption = adjacentMapInfo.KeyName + ": " + text + adjacentMapInfo.MapName + adjacentMapInfo.GetCoordString();
+				myVector.addElement(new Command(caption, AutoMap.getInstance(), 888, adjacentMapInfo));
+			}
+			GameCanvas.menu.startAt(myVector, 3);
+		}
+
+		public static void EnterWaypointDirect(Waypoint waypoint)
+		{
+			if (waypoint == null)
+			{
+				return;
+			}
+			int num = (int)(waypoint.minX + waypoint.maxX) / 2;
+			if (num < 15)
+			{
+				num = 15;
+			}
+			if (num > TileMap.pxw - 15)
+			{
+				num = TileMap.pxw - 15;
+			}
+			int num2 = AutoMap.GetBestWaypointY(waypoint, global::Char.myCharz().cy);
+			if (waypoint.popup != null)
+			{
+				waypoint.popup.isPaint = true;
+			}
+			for (int k = 0; k < PopUp.vPopups.size(); k++)
+			{
+				PopUp popUp = (PopUp)PopUp.vPopups.elementAt(k);
+				if (popUp != null)
+				{
+					popUp.isPaint = true;
+				}
+			}
+			AutoMap.TeleportTo(num, num2);
+			AutoMap.MarkActionSent();
+			if (waypoint.isOffline || TileMap.isTrainingMap())
+			{
+				Service.gI().getMapOffline();
+			}
+			else
+			{
+				Service.gI().requestChangeMap();
+			}
+			global::Char.isLockKey = true;
+			global::Char.ischangingMap = true;
+			GameCanvas.timeLoading = 0;
+			GameCanvas.TIMEOUT = mSystem.currentTimeMillis();
+			GameCanvas.clearKeyHold();
+			GameCanvas.clearKeyPressed();
+			InfoDlg.showWait();
 		}
 
 		// Token: 0x06000AF0 RID: 2800 RVA: 0x0000914D File Offset: 0x0000734D
@@ -794,39 +1001,135 @@ namespace Mod.DungPham.KoiOctiiu957
 		// Token: 0x06000B04 RID: 2820 RVA: 0x000A343C File Offset: 0x000A163C
 		private static int GetYGround(int x)
 		{
-			int num = 50;
-			int i = 0;
-			while (i < 30)
+			int limitY = (TileMap.pxh > 0) ? TileMap.pxh : 1000;
+			for (int y = 24; y < limitY; y += 24)
 			{
-				i++;
-				num += 24;
-				if (TileMap.tileTypeAt(x, num, 2))
+				if (TileMap.tileTypeAt(x, y, 2))
 				{
-					if (num % 24 != 0)
+					if (y % 24 != 0)
 					{
-						num -= num % 24;
-						break;
+						y -= y % 24;
 					}
-					break;
+					return y;
 				}
 			}
-			return num;
+			return -1;
 		}
 
 		// Token: 0x06000B05 RID: 2821 RVA: 0x000A3478 File Offset: 0x000A1678
-		private static void TeleportTo(int x, int y)
-		{  Char me = Char.myCharz();
-        me.cx = x;
-        me.cy = y;
-        Service.gI().charMove();
+		public static int GetBestWaypointY(Waypoint wp, int currentY)
+		{
+			if (wp == null)
+			{
+				return currentY;
+			}
+			return (int)(wp.minY + wp.maxY) / 2;
+		}
 
-        if (!GameScr.canAutoPlay)
-        {
-            me.cy = y + 1;
-            Service.gI().charMove();
-            me.cy = y;
-            Service.gI().charMove();
-        }
+		public static void TeleportTo(int targetX, int targetY)
+		{
+			global::Char me = global::Char.myCharz();
+			if (me == null)
+			{
+				return;
+			}
+
+			int startX = me.cx;
+			int startY = me.cy;
+			int stepSize = 150;
+
+			me.cvy = 0;
+			me.cvx = 0;
+
+			int diffX = targetX - startX;
+			int diffY = targetY - startY;
+			int distX = Res.abs(diffX);
+			int distY = Res.abs(diffY);
+
+			// Nếu khoảng cách rất ngắn (< 100px), dịch chuyển trực tiếp
+			if (distX < 100 && distY < 100)
+			{
+				me.cx = targetX;
+				me.cy = targetY;
+				me.statusMe = (TileMap.tileTypeAt(targetX / 24, targetY / 24) == 0) ? 3 : 1;
+				me.cxSend = -1;
+				me.cySend = -1;
+				Service.gI().charMove();
+				return;
+			}
+
+			// Tính tầm bay cao an toàn (flyY) vượt mọi vật cản/ngọn đồi ở giữa map
+			int minPointY = (startY < targetY) ? startY : targetY;
+			int flyY = minPointY - 100;
+			if (flyY < 60)
+			{
+				flyY = 60;
+			}
+			if (flyY > minPointY)
+			{
+				flyY = minPointY;
+			}
+
+			// Giai đoạn 1: Bay Y lên tầm cao an toàn flyY tại vị trí X khởi đầu
+			if (startY > flyY)
+			{
+				int diffY1 = flyY - startY;
+				int stepsY1 = (Res.abs(diffY1) + stepSize - 1) / stepSize;
+				if (stepsY1 < 1) stepsY1 = 1;
+				for (int i = 1; i <= stepsY1; i++)
+				{
+					int curY = startY + diffY1 * i / stepsY1;
+					me.cx = startX;
+					me.cy = curY;
+					me.statusMe = 3;
+					me.cxSend = -1;
+					me.cySend = -1;
+					Service.gI().charMove();
+				}
+			}
+
+			// Giai đoạn 2: Băng ngang X qua không trung trên tầm cao flyY (vượt mọi đồi núi/vật cản)
+			if (distX > 0)
+			{
+				int stepsX = (distX + stepSize - 1) / stepSize;
+				if (stepsX < 1) stepsX = 1;
+				for (int i = 1; i <= stepsX; i++)
+				{
+					int curX = startX + diffX * i / stepsX;
+					me.cx = curX;
+					me.cy = flyY;
+					me.statusMe = 3;
+					me.cxSend = -1;
+					me.cySend = -1;
+					Service.gI().charMove();
+				}
+			}
+
+			// Giai đoạn 3: Hạ Y từ flyY xuống targetY tại vị trí targetX
+			if (targetY != flyY)
+			{
+				int diffY2 = targetY - flyY;
+				int stepsY2 = (Res.abs(diffY2) + stepSize - 1) / stepSize;
+				if (stepsY2 < 1) stepsY2 = 1;
+				for (int i = 1; i <= stepsY2; i++)
+				{
+					int curY = flyY + diffY2 * i / stepsY2;
+					me.cx = targetX;
+					me.cy = curY;
+					me.statusMe = 3;
+					me.cxSend = -1;
+					me.cySend = -1;
+					Service.gI().charMove();
+				}
+			}
+
+			// Chốt tọa độ đích cuối cùng
+			me.cx = targetX;
+			me.cy = targetY;
+			me.statusMe = (TileMap.tileTypeAt(targetX / 24, targetY / 24) == 0) ? 3 : 1;
+			me.cxSend = -1;
+			me.cySend = -1;
+			Service.gI().charMove();
 		}
 
 		// Token: 0x06000B06 RID: 2822 RVA: 0x000091D4 File Offset: 0x000073D4
@@ -863,68 +1166,166 @@ namespace Mod.DungPham.KoiOctiiu957
 		}
 
 		// Token: 0x06000B0A RID: 2826 RVA: 0x000A353C File Offset: 0x000A173C
-		private static void LoadMap(int position)
+		public static void LoadMap(int position)
 		{
 			if (AutoMap.isNRDMap(TileMap.mapID))
 			{
 				AutoMap.TeleportInNRDMap(position);
 				return;
 			}
-			GameCanvas.timeLoading = 15;
-			GameCanvas.TIMEOUT = mSystem.currentTimeMillis();
-			global::Char.isLoadingMap = true;
-			global::Char.isLockKey = true;
-			global::Char.ischangingMap = true;
-			GameCanvas.clearKeyHold();
-			GameCanvas.clearKeyPressed();
-			AutoMap.LoadWaypointsInMap();
-			switch (position)
+
+			global::Char me = global::Char.myCharz();
+			if (me.meDead || me.statusMe == 14 || me.statusMe == 5 || me.cHP <= 0L)
 			{
-			case 0:
-				if (AutoMap.wayPointMapLeft[0] != 0 && AutoMap.wayPointMapLeft[1] != 0)
-				{
-					AutoMap.TeleportTo(AutoMap.wayPointMapLeft[0], AutoMap.wayPointMapLeft[1]);
-				}
-				else
-				{
-					AutoMap.TeleportTo(60, AutoMap.GetYGround(60));
-				}
-				break;
-			case 1:
-				if (AutoMap.wayPointMapRight[0] != 0 && AutoMap.wayPointMapRight[1] != 0)
-				{
-					AutoMap.TeleportTo(AutoMap.wayPointMapRight[0], AutoMap.wayPointMapRight[1]);
-				}
-				else
-				{
-					AutoMap.TeleportTo(TileMap.pxw - 60, AutoMap.GetYGround(TileMap.pxw - 60));
-				}
-				break;
-			case 2:
-				if (AutoMap.wayPointMapCenter[0] != 0 && AutoMap.wayPointMapCenter[1] != 0)
-				{
-					AutoMap.TeleportTo(AutoMap.wayPointMapCenter[0], AutoMap.wayPointMapCenter[1]);
-				}
-				else
-				{
-					AutoMap.TeleportTo(TileMap.pxw / 2, AutoMap.GetYGround(TileMap.pxw / 2));
-				}
-				break;
-			}
-			if (TileMap.mapID != 7 && TileMap.mapID != 14 && TileMap.mapID != 0)
-			{
-				try
-				{
-					AutoMap.isAutoChangeMap = true;
-					Service.gI().requestChangeMap();
-				}
-				finally
-				{
-					AutoMap.isAutoChangeMap = false;
-				}
+				GameScr.info1.addInfo("Bạn đang kiệt sức!", 0);
 				return;
 			}
-			Service.gI().getMapOffline();
+
+			// Đảm bảo không bị chặn charMove và các kiểm tra map
+			global::Char.ischangingMap = false;
+			global::Char.isLoadingMap = false;
+			global::Char.isLockKey = false;
+			AutoMap.isAutoChangeMap = true;
+
+			int wpCount = TileMap.vGo.size();
+			if (wpCount == 0)
+			{
+				GameScr.info1.addInfo("Map này không có điểm chuyển map!", 0);
+				return;
+			}
+
+			List<Waypoint> listWp = new List<Waypoint>();
+			for (int i = 0; i < wpCount; i++)
+			{
+				Waypoint wp = (Waypoint)TileMap.vGo.elementAt(i);
+				if (wp != null)
+				{
+					listWp.Add(wp);
+				}
+			}
+
+			if (listWp.Count == 0)
+			{
+				GameScr.info1.addInfo("Map này không có điểm chuyển map!", 0);
+				return;
+			}
+
+			// Sắp xếp các Waypoint theo tọa độ X trung tâm từ trái qua phải
+			listWp.Sort((w1, w2) => ((int)(w1.minX + w1.maxX)).CompareTo((int)(w2.minX + w2.maxX)));
+
+			Waypoint targetWp = null;
+			if (position == 0) // Trái (J)
+			{
+				targetWp = listWp[0];
+			}
+			else if (position == 1) // Phải (L)
+			{
+				targetWp = listWp[listWp.Count - 1];
+			}
+			else if (position == 2) // Giữa (K)
+			{
+				if (listWp.Count <= 2)
+				{
+					int midMapX = TileMap.pxw / 2;
+					Waypoint closest = listWp[0];
+					int minDiff = Res.abs((int)(closest.minX + closest.maxX) / 2 - midMapX);
+					for (int j = 1; j < listWp.Count; j++)
+					{
+						int diff = Res.abs((int)(listWp[j].minX + listWp[j].maxX) / 2 - midMapX);
+						if (diff < minDiff)
+						{
+							minDiff = diff;
+							closest = listWp[j];
+						}
+					}
+					targetWp = closest;
+				}
+				else
+				{
+					targetWp = listWp[listWp.Count / 2];
+				}
+			}
+
+			if (targetWp == null)
+			{
+				targetWp = listWp[0];
+			}
+
+			// Tính toán tọa độ X an toàn: chính giữa Waypoint
+			int targetX = (int)(targetWp.minX + targetWp.maxX) / 2;
+
+			// Giữ targetX trong giới hạn an toàn của bản đồ (tránh va chạm mép map < 15px hoặc > pxw - 15px)
+			if (targetX < 15)
+			{
+				targetX = 15;
+			}
+			if (targetX > TileMap.pxw - 15)
+			{
+				targetX = TileMap.pxw - 15;
+			}
+
+			// Đảm bảo targetX luôn nằm trọn trong Waypoint
+			if (targetX < (int)targetWp.minX)
+			{
+				targetX = (int)targetWp.minX + 2;
+			}
+			if (targetX > (int)targetWp.maxX)
+			{
+				targetX = (int)targetWp.maxX - 2;
+			}
+
+			// Tọa độ Y chuẩn xác: Giữ nguyên Y nếu đã nằm trong Waypoint, hoặc lấy tâm Y để tránh vượt khung khi gồ ghề
+			int targetY = AutoMap.GetBestWaypointY(targetWp, me.cy);
+
+			// Kích hoạt PopUp của Waypoint để isInEnterOnlinePoint() / isInEnterOfflinePoint() trả về hợp lệ
+			if (targetWp.popup != null)
+			{
+				targetWp.popup.isPaint = true;
+			}
+			for (int k = 0; k < PopUp.vPopups.size(); k++)
+			{
+				PopUp popUp = (PopUp)PopUp.vPopups.elementAt(k);
+				if (popUp != null)
+				{
+					popUp.isPaint = true;
+				}
+			}
+
+			string posName = (position == 0) ? "Trái (J)" : ((position == 1) ? "Phải (L)" : "Giữa (K)");
+			string cmdName = (targetWp.isOffline || TileMap.isTrainingMap()) ? "getMapOffline (cmd -33)" : "requestChangeMap (cmd -23)";
+			Debug.Log(string.Format("[AutoMap] Bấm {0} | MapID={1} | Waypoint: X[{2}..{3}] Y[{4}..{5}] | From: ({6}, {7}) -> Target: ({8}, {9}) | Gói tin: {10}",
+				posName, TileMap.mapID, targetWp.minX, targetWp.maxX, targetWp.minY, targetWp.maxY, me.cx, me.cy, targetX, targetY, cmdName));
+			GameScr.info1.addInfo(string.Format("Qua map [{0}] -> ({1}, {2})", posName, targetX, targetY), 0);
+
+			// Dọn dẹp hành động và tiêu điểm để không bị ngắt
+			GameScr.gI().auto = 0;
+			me.currentMovePoint = null;
+			me.charFocus = null;
+			me.mobFocus = null;
+			me.npcFocus = null;
+			me.itemFocus = null;
+
+			// Dịch chuyển từng bước an toàn và gửi vị trí mới lên Server
+			AutoMap.TeleportTo(targetX, targetY);
+
+			// Gửi gói tin chuyển map tương ứng (Offline hoặc Online)
+			AutoMap.MarkActionSent();
+			if (targetWp.isOffline || TileMap.isTrainingMap())
+			{
+				Service.gI().getMapOffline();
+			}
+			else
+			{
+				Service.gI().requestChangeMap();
+			}
+
+			global::Char.isLockKey = true;
+			global::Char.ischangingMap = true;
+			GameCanvas.timeLoading = 0;
+			GameCanvas.TIMEOUT = mSystem.currentTimeMillis();
+			GameCanvas.clearKeyHold();
+			GameCanvas.clearKeyPressed();
+			InfoDlg.showWait();
 		}
 
 		// Token: 0x06000B0B RID: 2827 RVA: 0x000A3684 File Offset: 0x000A1884
@@ -1200,7 +1601,19 @@ namespace Mod.DungPham.KoiOctiiu957
 			public void Enter(Waypoint waypoint)
 			{
 				int num = (waypoint.maxX < 60) ? 15 : (((int)waypoint.minX <= TileMap.pxw - 60) ? ((int)((waypoint.minX + waypoint.maxX) / 2)) : (TileMap.pxw - 15));
-				int maxY = (int)waypoint.maxY;
+				int maxY = AutoMap.GetBestWaypointY(waypoint, global::Char.myCharz().cy);
+				if (waypoint.popup != null)
+				{
+					waypoint.popup.isPaint = true;
+				}
+				for (int k = 0; k < PopUp.vPopups.size(); k++)
+				{
+					PopUp popUp = (PopUp)PopUp.vPopups.elementAt(k);
+					if (popUp != null)
+					{
+						popUp.isPaint = true;
+					}
+				}
 				if (num == -1 || maxY == -1)
 				{
 					GameScr.info1.addInfo("Có lỗi xảy ra", 0);
@@ -1232,22 +1645,7 @@ namespace Mod.DungPham.KoiOctiiu957
 			// Token: 0x06000B14 RID: 2836 RVA: 0x000A3984 File Offset: 0x000A1B84
 			public void TeleportTo(int x, int y)
 			{
-				if (GameScr.canAutoPlay)
-				{
-					global::Char.myCharz().cx = x;
-					global::Char.myCharz().cy = y;
-					Service.gI().charMove();
-					return;
-				}
-				global::Char.myCharz().cx = x;
-				global::Char.myCharz().cy = y;
-				Service.gI().charMove();
-				global::Char.myCharz().cx = x;
-				global::Char.myCharz().cy = y + 1;
-				Service.gI().charMove();
-				global::Char.myCharz().cx = x;
-				global::Char.myCharz().cy = y;
-				Service.gI().charMove();
+				AutoMap.TeleportTo(x, y);
 			}
 
 			// Token: 0x040015AB RID: 5547

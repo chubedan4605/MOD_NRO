@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 // Token: 0x02000069 RID: 105
 public class ItemTime
@@ -228,7 +228,7 @@ public class ItemTime
 	private string text;
 
 	// Token: 0x04000657 RID: 1623
-	private bool isPaint_coolDownBar;
+	public bool isPaint_coolDownBar;
 
 	// Token: 0x04000658 RID: 1624
 	public int time;

@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 using Assets.src.g;
 using Mod.DungPham.KoiOctiiu957;
 
@@ -3512,6 +3513,10 @@ public class GameScr : mScreen, IChatable
 		this.selectedIndexSkill = -1;
 		if (skill != null)
 		{
+			if (skill.template != null)
+			{
+				Debug.Log("[USE SKILL] Name=" + skill.template.name + " | ID=" + skill.template.id + " | point=" + skill.point + " | isShortcut=" + isShortcut);
+			}
 			Service.gI().selectSkill((int)skill.template.id);
 			this.saveRMSCurrentSkill(skill.template.id);
 			this.resetButton();
@@ -3532,6 +3537,10 @@ public class GameScr : mScreen, IChatable
 			this.selectedIndexSkill = -1;
 			if (skill != null)
 			{
+				if (skill.template != null)
+				{
+					Debug.Log("[USE SKILL NOT FOCUS] Name=" + skill.template.name + " | ID=" + skill.template.id + " | point=" + skill.point);
+				}
 				Service.gI().selectSkill((int)skill.template.id);
 				this.saveRMSCurrentSkill(skill.template.id);
 				this.resetButton();

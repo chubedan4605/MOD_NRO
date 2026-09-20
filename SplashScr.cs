@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 // Token: 0x020000C8 RID: 200
 public class SplashScr : mScreen
@@ -39,9 +39,9 @@ public class SplashScr : mScreen
 		}
 		if (SplashScr.splashScrStat >= 150)
 		{
+			ServerListScreen.loadScreen = true;
 			if (Session_ME.gI().isConnected())
 			{
-				ServerListScreen.loadScreen = true;
 				GameCanvas.serverScreen.switchToMe();
 			}
 			else

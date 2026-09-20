@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Assets.src.e;
 using Assets.src.g;
 using Mod.DungPham.KoiOctiiu957;
@@ -2285,12 +2285,26 @@ public class GameCanvas : IActionListener
 		}
 	}
 
-	// Token: 0x06000AAA RID: 2730 RVA: 0x000A0268 File Offset: 0x0009E468
 	public void paintChangeMap(mGraphics g)
 	{
 		GameCanvas.resetTrans(g);
 		g.setColor(0);
 		g.fillRect(0, 0, GameCanvas.w, GameCanvas.h);
+		if (LoginScr.imgTitle != null)
+		{
+			g.drawImage(LoginScr.imgTitle, GameCanvas.w / 2, GameCanvas.h / 2 - 24, StaticObj.BOTTOM_HCENTER);
+		}
+		string text = mResources.PLEASEWAIT;
+		if (LoginScr.timeLogin > 0)
+		{
+			text = text + " " + LoginScr.timeLogin + "s";
+		}
+		else if (GameCanvas.timeLoading > 0)
+		{
+			text = text + " " + GameCanvas.timeLoading + "s";
+		}
+		GameCanvas.paintShukiren(GameCanvas.hw, GameCanvas.h / 2 + 24, g);
+		mFont.tahoma_7b_white.drawString(g, text, GameCanvas.w / 2, GameCanvas.h / 2, 2);
 	}
 
 	// Token: 0x06000AAB RID: 2731 RVA: 0x000A0334 File Offset: 0x0009E534
@@ -2376,7 +2390,7 @@ public class GameCanvas : IActionListener
 					GameCanvas.timeLoading--;
 					if (GameCanvas.timeLoading == 0)
 					{
-						GameCanvas.timeLoading = 15;
+						GameCanvas.timeLoading = 0;
 					}
 					GameCanvas.TIMEOUT = mSystem.currentTimeMillis();
 				}

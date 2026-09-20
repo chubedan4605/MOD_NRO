@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 
 // Token: 0x020000A6 RID: 166
@@ -244,7 +244,7 @@ public class CrackBallScr : mScreen
 						SoundMn.gI().newKame();
 						if (!this.isSendSv && this.timeKame - GameCanvas.timeNow < 0L)
 						{
-							Service.gI().SendCrackBall(2, this.checkTicket() + this.checkNum());
+							Service.gI().SendCrackBall(2, (byte)(this.checkTicket() + this.checkNum()));
 							this.isSendSv = true;
 						}
 					}

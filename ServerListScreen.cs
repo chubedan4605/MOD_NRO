@@ -1,4 +1,6 @@
-﻿using System;
+using System;
+using System.Net.Sockets;
+using System.Threading;
 using UnityEngine;
 
 // Token: 0x020000C6 RID: 198
@@ -248,7 +250,7 @@ public class ServerListScreen : mScreen, IActionListener
 	// Token: 0x06000A04 RID: 2564 RVA: 0x00096DD8 File Offset: 0x00094FD8
 	public override void paint(mGraphics g)
 	{
-		if (!ServerListScreen.loadScreen)
+		if (!ServerListScreen.loadScreen && !ServerListScreen.bigOk)
 		{
 			g.setColor(0);
 			g.fillRect(0, 0, GameCanvas.w, GameCanvas.h);
@@ -268,19 +270,13 @@ public class ServerListScreen : mScreen, IActionListener
 		}), GameCanvas.w - 2, num + 15, 1, mFont.tahoma_7_grey);
 		try
 		{
-			string text = string.Empty;
-			if (ServerListScreen.testConnect == 0)
-			{
-				text = text + ServerListScreen.nameServer[ServerListScreen.ipSelect] + " disconnect";
-			}
-			else
-			{
-				text = text + ServerListScreen.nameServer[ServerListScreen.ipSelect] + " connected";
-			}
-			if (mSystem.isTest)
-			{
-				mFont.tahoma_7_white.drawString(g, text, GameCanvas.w - 2, num + 15 + 15, 1, mFont.tahoma_7_grey);
-			}
+			bool isConnected = ServerListScreen.isServerOnline || Session_ME.gI().isConnected();
+			string text = ServerListScreen.nameServer[ServerListScreen.ipSelect] + (isConnected ? " connected" : " disconnect");
+			int textWidth = mFont.tahoma_7_white.getWidth(text);
+			int dotX = GameCanvas.w - 2 - textWidth - 8;
+			int dotY = num + 30 + 5;
+			ServerListScreen.paintConnectionDot(g, dotX, dotY, isConnected);
+			mFont.tahoma_7_white.drawString(g, text, GameCanvas.w - 2, num + 30, 1, mFont.tahoma_7_grey);
 		}
 		catch (Exception ex)
 		{
@@ -302,11 +298,9 @@ public class ServerListScreen : mScreen, IActionListener
 		}
 		int num2 = (GameCanvas.w < 200) ? 160 : 180;
 		ServerListScreen.paintDeleteData(g);
-		if (!ServerListScreen.loadScreen)
+		if (!ServerListScreen.loadScreen && !ServerListScreen.bigOk)
 		{
-			if (!ServerListScreen.bigOk)
-			{
-				g.drawImage(LoginScr.imgTitle, GameCanvas.hw, GameCanvas.hh - 32, 3);
+			g.drawImage(LoginScr.imgTitle, GameCanvas.hw, GameCanvas.hh - 32, 3);
 				if (!ServerListScreen.isGetData)
 				{
 					mFont.tahoma_7b_white.drawString(g, mResources.taidulieudechoi, GameCanvas.hw, GameCanvas.hh + 24, 2);
@@ -324,7 +318,6 @@ public class ServerListScreen : mScreen, IActionListener
 					mFont.tahoma_7b_white.drawString(g, mResources.downloading_data + ServerListScreen.percent + "%", GameCanvas.w / 2, GameCanvas.hh + 24, 2);
 					GameScr.paintOngMauPercent(GameScr.frBarPow20, GameScr.frBarPow21, GameScr.frBarPow22, (float)(GameCanvas.w / 2 - 50), (float)(GameCanvas.hh + 45), 100, 100f, g);
 					GameScr.paintOngMauPercent(GameScr.frBarPow0, GameScr.frBarPow1, GameScr.frBarPow2, (float)(GameCanvas.w / 2 - 50), (float)(GameCanvas.hh + 45), 100, (float)ServerListScreen.percent, g);
-				}
 			}
 		}
 		else
@@ -353,19 +346,14 @@ public class ServerListScreen : mScreen, IActionListener
 					this.cmd[i].paint(g);
 				}
 				g.setClip(0, 0, GameCanvas.w, GameCanvas.h);
-				if (mGraphics.zoomLevel == 1)
+				int serverBtnIndex = 2 + this.nCmdPlay;
+				if (serverBtnIndex >= 0 && serverBtnIndex < this.cmd.Length && this.cmd[serverBtnIndex] != null)
 				{
-					if (ServerListScreen.testConnect == -1)
-					{
-						if (GameCanvas.gameTick % 20 > 10)
-						{
-							g.drawRegion(GameScr.imgRoomStat, 0, 14, 7, 7, 0, (GameCanvas.w - mFont.tahoma_7b_dark.getWidth(this.cmd[2 + this.nCmdPlay].caption) >> 1) - 10, this.cmd[2 + this.nCmdPlay].y + 10, 0);
-						}
-					}
-					else
-					{
-						g.drawRegion(GameScr.imgRoomStat, 0, ServerListScreen.testConnect * 7, 7, 7, 0, (GameCanvas.w - mFont.tahoma_7b_dark.getWidth(this.cmd[2 + this.nCmdPlay].caption) >> 1) - 10, this.cmd[2 + this.nCmdPlay].y + 9, 0);
-					}
+					bool isConnected = ServerListScreen.isServerOnline || Session_ME.gI().isConnected();
+					int captionWidth = mFont.tahoma_7b_dark.getWidth(this.cmd[serverBtnIndex].caption);
+					int btnDotX = ((GameCanvas.w - captionWidth) >> 1) - 10;
+					int btnDotY = this.cmd[serverBtnIndex].y + 11;
+					ServerListScreen.paintConnectionDot(g, btnDotX, btnDotY, isConnected);
 				}
 			}
 		}
@@ -435,6 +423,7 @@ public class ServerListScreen : mScreen, IActionListener
 			ServerListScreen.cmdDownload = null;
 		}
 		base.update();
+		ServerListScreen.UpdateServerCheck();
 		if (global::Char.isLoadingMap)
 		{
 			return;
@@ -451,19 +440,19 @@ public class ServerListScreen : mScreen, IActionListener
 		{
 			return;
 		}
-		if (!Session_ME.gI().isConnected())
+		if (!Session_ME.gI().isConnected() && !Session_ME.connecting)
 		{
 			if (mSystem.currentTimeMillis() > ServerListScreen.count_reConnect)
 			{
+				ServerListScreen.count_reConnect = mSystem.currentTimeMillis() + 8000L;
 				ServerListScreen.SetIpSelect(ServerListScreen.ipSelect, true);
 				Session_ME.gI().close();
 				ServerListScreen.ConnectIP();
-				ServerListScreen.count_reConnect = mSystem.currentTimeMillis() + 5000L;
 			}
 		}
 		else
 		{
-			ServerListScreen.count_reConnect = mSystem.currentTimeMillis() + 5000L;
+			ServerListScreen.count_reConnect = mSystem.currentTimeMillis() + 8000L;
 		}
 	}
 
@@ -694,13 +683,8 @@ public class ServerListScreen : mScreen, IActionListener
 		this.initCommand();
 		ServerListScreen.isWait = false;
 		GameCanvas.loginScr = null;
-		string text = Rms.loadRMSString("ResVersion");
-		int num = (text == null || !(text != string.Empty)) ? -1 : int.Parse(text);
-		if (num > 0)
-		{
-			ServerListScreen.loadScreen = true;
-			GameCanvas.loadBG(0);
-		}
+		ServerListScreen.loadScreen = true;
+		GameCanvas.loadBG(0);
 		ServerListScreen.bigOk = true;
 		this.cmd[2 + this.nCmdPlay].caption = mResources.server + ": " + ServerListScreen.nameServer[ServerListScreen.ipSelect];
 		this.center = new Command(string.Empty, this, this.cmd[ServerListScreen.selected].idAction, null);
@@ -722,13 +706,8 @@ public class ServerListScreen : mScreen, IActionListener
 		this.initCommand();
 		ServerListScreen.isWait = false;
 		GameCanvas.loginScr = null;
-		string text = Rms.loadRMSString("ResVersion");
-		int num = (text == null || !(text != string.Empty)) ? -1 : int.Parse(text);
-		if (num > 0)
-		{
-			ServerListScreen.loadScreen = true;
-			GameCanvas.loadBG(0);
-		}
+		ServerListScreen.loadScreen = true;
+		GameCanvas.loadBG(0);
 		ServerListScreen.bigOk = true;
 		this.cmd[2 + this.nCmdPlay].caption = mResources.server + ": " + ServerListScreen.nameServer[ServerListScreen.ipSelect];
 		this.center = new Command(string.Empty, this, this.cmd[ServerListScreen.selected].idAction, null);
@@ -1498,4 +1477,29 @@ public class ServerListScreen : mScreen, IActionListener
 
 	// Token: 0x040012C5 RID: 4805
 	public static bool isAutoLogin = true;
+
+	public static bool isServerOnline;
+
+	public static void paintConnectionDot(mGraphics g, int x, int y, bool isConnected)
+	{
+		int dotColor = isConnected ? 0x00E600 : 0x888888;
+		int borderColor = isConnected ? 0x003300 : 0x222222;
+		int shineColor = isConnected ? 0x99FF99 : 0xBBBBBB;
+
+		g.setColor(borderColor);
+		g.fillRect(x - 3, y - 4, 6, 8);
+		g.fillRect(x - 4, y - 3, 8, 6);
+
+		g.setColor(dotColor);
+		g.fillRect(x - 2, y - 3, 4, 6);
+		g.fillRect(x - 3, y - 2, 6, 4);
+
+		g.setColor(shineColor);
+		g.fillRect(x - 2, y - 2, 2, 2);
+	}
+
+	public static void UpdateServerCheck()
+	{
+		ServerListScreen.isServerOnline = Session_ME.gI().isConnected();
+	}
 }

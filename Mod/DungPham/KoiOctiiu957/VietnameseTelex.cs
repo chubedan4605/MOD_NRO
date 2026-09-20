@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 
 namespace Mod.DungPham.KoiOctiiu957
@@ -435,7 +435,7 @@ namespace Mod.DungPham.KoiOctiiu957
 
 					if (isU && isO)
 					{
-						int combinedTone = Math.Max(toneU, toneO);
+						int combinedTone = System.Math.Max(toneU, toneO);
 						StringBuilder sb = new StringBuilder(word);
 						sb[i] = (rowU >= 21) ? VOWEL_TABLE[22][0] : VOWEL_TABLE[10][0];
 						sb[i + 1] = (rowO >= 18) ? VOWEL_TABLE[20][combinedTone] : VOWEL_TABLE[8][combinedTone];

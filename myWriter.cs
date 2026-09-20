@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 
 // Token: 0x0200002F RID: 47
@@ -128,13 +128,13 @@ public class myWriter
 	// Token: 0x06000213 RID: 531 RVA: 0x00005320 File Offset: 0x00003520
 	public void writeBoolean(bool value)
 	{
-		this.writeSByte((!value) ? 0 : 1);
+		this.writeSByte((sbyte)((!value) ? 0 : 1));
 	}
 
 	// Token: 0x06000214 RID: 532 RVA: 0x00005320 File Offset: 0x00003520
 	public void writeBool(bool value)
 	{
-		this.writeSByte((!value) ? 0 : 1);
+		this.writeSByte((sbyte)((!value) ? 0 : 1));
 	}
 
 	// Token: 0x06000215 RID: 533 RVA: 0x00013BA8 File Offset: 0x00011DA8

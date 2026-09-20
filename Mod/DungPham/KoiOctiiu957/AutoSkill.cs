@@ -668,7 +668,7 @@ namespace Mod.DungPham.KoiOctiiu957
 		};
 
 		// Token: 0x040015D0 RID: 5584
-		private static bool isSaveData;
+		public static bool isSaveData;
 
 		// Token: 0x040015D1 RID: 5585
 		private static long lastTimeAutoUseSkill;

@@ -394,15 +394,13 @@ public class LoginScr : mScreen, IActionListener
 		{
 			GameCanvas.connect();
 		}
-		Service.gI().login(text, text2, GameMidlet.VERSION, (!this.isLogin2) ? 0 : 1);
+		Service.gI().login(text, text2, GameMidlet.VERSION, (sbyte)((!this.isLogin2) ? 0 : 1));
 		Res.outz(string.Concat(new object[]
 		{
 			Controller.isEXTRA_LINK,
 			" = Controller.isEXTRA_LINK ",
 			text,
-			" ",
-			text2,
-			" ",
+			" *** ",
 			GameMidlet.VERSION,
 			" ",
 			(!this.isLogin2) ? 0 : 1
@@ -1021,13 +1019,6 @@ public class LoginScr : mScreen, IActionListener
 		}
 	}
 
-	// Token: 0x06000839 RID: 2105 RVA: 0x00007EC5 File Offset: 0x000060C5
-	public void ShowAutoManager()
-	{
-		this.switchToMe();
-		this.OpenAutoManager();
-	}
-
 	// Token: 0x06000819 RID: 2073 RVA: 0x00073DF4 File Offset: 0x00071FF4
 	private void doChangeTip()
 	{
@@ -1357,6 +1348,11 @@ public class LoginScr : mScreen, IActionListener
 									{
 										this.actRegisterLeft();
 									}
+									else if (idAction >= 17100 && idAction < 17100 + this.autoManagerDelete.Length)
+									{
+										this.DeleteAutoManagerAccount(idAction - 17100);
+										GameCanvas.clearAllPointerEvent();
+									}
 								}
 								else
 								{
@@ -1441,13 +1437,6 @@ public class LoginScr : mScreen, IActionListener
 			case 17007:
 				this.ToggleRememberLogin();
 				GameCanvas.clearAllPointerEvent();
-				break;
-			default:
-				if (idAction >= 17100 && idAction < 17100 + this.autoManagerDelete.Length)
-				{
-					this.DeleteAutoManagerAccount(idAction - 17100);
-					GameCanvas.clearAllPointerEvent();
-				}
 				break;
 			}
 			break;

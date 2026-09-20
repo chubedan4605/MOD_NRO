@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Assets.src.g;
 
 namespace Assets.src.f
@@ -302,14 +302,12 @@ namespace Assets.src.f
 				{
 					long num8 = mSystem.currentTimeMillis();
 					Service.logMap = num8 - Service.curCheckMap;
-					Service.gI().sendCheckMap();
 					break;
 				}
 				case 8:
 				{
 					long num9 = mSystem.currentTimeMillis();
 					Service.logController = num9 - Service.curCheckController;
-					Service.gI().sendCheckController();
 					break;
 				}
 				case 9:
