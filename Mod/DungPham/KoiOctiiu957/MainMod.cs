@@ -75,6 +75,7 @@ namespace Mod.DungPham.KoiOctiiu957
 				AutoMap.Update();
 				AutoPoint.Update();
 				AutoChat.Update();
+				AutoBoss.Update();
 				ModSkin.Update();
 
 				try
@@ -122,6 +123,12 @@ namespace Mod.DungPham.KoiOctiiu957
 			}), 25, startY, 0);
 			startY += 10;
 			mFont.tahoma_7.drawString(g, "Time: " + DateTime.Now.ToString("HH:mm:ss dd/MM/yyyy"), 25, startY, 0);
+			if (AutoBoss.isAutoAttackBoss)
+			{
+				startY += 10;
+				string bossInfo = (AutoBoss.listBossTargets.Count > 0) ? string.Join(", ", AutoBoss.listBossTargets.ToArray()) : "Mọi Boss";
+				mFont.tahoma_7b_red.drawString(g, "Auto Boss: ON [" + bossInfo + "]", 25, startY, 0);
+			}
 			startY += 10;
 			mFont.tahoma_7.drawString(g, string.Concat(new string[]
 			{
@@ -517,6 +524,9 @@ namespace Mod.DungPham.KoiOctiiu957
 			case 8:
 				MainMod.ShowMenuMore();
 				return;
+			case 99:
+				AutoBoss.ShowMenu();
+				return;
 			case 9:
 				if (MainMod.minumumHPPercentFusionDance > 0)
 				{
@@ -905,6 +915,7 @@ namespace Mod.DungPham.KoiOctiiu957
 			myVector.addElement(new Command("Auto Pean", MainMod.getInstance(), 3, null));
 			myVector.addElement(new Command("Auto Pick", MainMod.getInstance(), 4, null));
 			myVector.addElement(new Command("Auto Train", MainMod.getInstance(), 5, null));
+			myVector.addElement(new Command("Auto Boss", MainMod.getInstance(), 99, null));
 			myVector.addElement(new Command("Cài Đặt\nHiển Thị", MainMod.getInstance(), 36, null));
 			myVector.addElement(new Command("More", MainMod.getInstance(), 8, null));
 			GameCanvas.menu.startAt(myVector, 3);

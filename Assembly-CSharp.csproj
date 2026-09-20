@@ -165,6 +165,7 @@
     <Compile Include="Mob.cs" />
     <Compile Include="MobCapcha.cs" />
     <Compile Include="MobTemplate.cs" />
+    <Compile Include="Mod\DungPham\KoiOctiiu957\AutoBoss.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\AutoChat.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\AutoItem.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\AutoMap.cs" />
