@@ -728,7 +728,13 @@ namespace Mod.DungPham.KoiOctiiu957
 				GameScr.info1.addInfo("Tự Đánh\n" + (AutoSkill.isAutoSendAttack ? "[STATUS: ON]" : "[STATUS: OFF]"), 0);
 				result = true;
 			}
-			else if (GameCanvas.keyAsciiPress == Hotkeys.B)
+			else if (GameCanvas.keyAsciiPress == Hotkeys.B || GameCanvas.keyAsciiPress == Hotkeys.Z)
+			{
+				AutoBoss.isAutoAttackBoss = !AutoBoss.isAutoAttackBoss;
+				GameScr.info1.addInfo("Auto Đánh Boss [B/Z]\n" + (AutoBoss.isAutoAttackBoss ? "[STATUS: ON]" : "[STATUS: OFF]"), 0);
+				result = true;
+			}
+			else if (GameCanvas.keyAsciiPress == Hotkeys.V)
 			{
 				Service.gI().friend(0, -1);
 				result = true;

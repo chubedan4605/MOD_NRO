@@ -354,7 +354,7 @@ namespace Mod.DungPham.KoiOctiiu957
 		public static void ShowMenu()
 		{
 			MyVector myVector = new MyVector();
-			myVector.addElement(new Command("Auto Đánh Boss\n" + (isAutoAttackBoss ? "[STATUS: ON]" : "[STATUS: OFF]"), getInstance(), 1, null));
+			myVector.addElement(new Command("Auto Đánh Boss [B/Z]\n" + (isAutoAttackBoss ? "[STATUS: ON]" : "[STATUS: OFF]"), getInstance(), 1, null));
 			myVector.addElement(new Command("Nhập Tên Boss", getInstance(), 2, null));
 			myVector.addElement(new Command("Dán Boss Từ Clipboard", getInstance(), 6, null));
 			myVector.addElement(new Command("Thêm Boss Đang Chọn", getInstance(), 3, null));
