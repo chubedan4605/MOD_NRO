@@ -1414,18 +1414,7 @@ public class Panel : IActionListener, IChatable
 	{
 		if (this.chatTField != null && this.chatTField.isShow)
 		{
-			if (this.chatTField.left != null && (GameCanvas.keyPressed[12] || mScreen.getCmdPointerLast(this.chatTField.left)) && this.chatTField.left != null)
-			{
-				this.chatTField.left.performAction();
-			}
-			if (this.chatTField.right != null && (GameCanvas.keyPressed[13] || mScreen.getCmdPointerLast(this.chatTField.right)) && this.chatTField.right != null)
-			{
-				this.chatTField.right.performAction();
-			}
-			if (this.chatTField.center != null && (GameCanvas.keyPressed[(!Main.isPC) ? 5 : 25] || mScreen.getCmdPointerLast(this.chatTField.center)) && this.chatTField.center != null)
-			{
-				this.chatTField.center.performAction();
-			}
+			this.chatTField.update();
 			if (this.chatTField.isShow && GameCanvas.keyAsciiPress != 0)
 			{
 				this.chatTField.keyPressed(GameCanvas.keyAsciiPress);
@@ -6973,17 +6962,14 @@ public class Panel : IActionListener, IChatable
 		}
 		if (this.chatTField != null && this.chatTField.isShow)
 		{
-			GameScr.info1.addInfo("CHAT IS SHOW -> RETURN", 0);
 			this.chatTField.update();
 			return;
 		}
 		if (this.isKiguiXu)
 		{
-			GameScr.info1.addInfo("KIGUI XU DELAY=" + this.delayKigui, 0);
 			this.delayKigui++;
 			if (this.delayKigui == 10)
 			{
-				GameScr.info1.addInfo("KIGUI XU OPEN INPUT", 0);
 				this.delayKigui = 0;
 				this.isKiguiXu = false;
 				this.chatTField.tfChat.setText(string.Empty);
@@ -8077,6 +8063,8 @@ public class Panel : IActionListener, IChatable
 			this.chatTField.startChat2(this, string.Empty);
 		}
 	}
+
+
 
 	// Token: 0x0600095A RID: 2394 RVA: 0x0008BE08 File Offset: 0x0008A008
 	public void chagenSlogan()

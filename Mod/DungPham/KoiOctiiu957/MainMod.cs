@@ -1689,7 +1689,7 @@ namespace Mod.DungPham.KoiOctiiu957
 		// Token: 0x06000BC7 RID: 3015 RVA: 0x000AA960 File Offset: 0x000A8B60
 		public static bool isBoss(global::Char ch)
 		{
-			return ch.cName != null && ch.cName != "" && !ch.isPet && !ch.isMiniPet && char.IsUpper(char.Parse(ch.cName.Substring(0, 1))) && ch.cName != "Trọng tài" && !ch.cName.StartsWith("#") && !ch.cName.StartsWith("$");
+			return ch != null && !string.IsNullOrEmpty(ch.cName) && !ch.isPet && !ch.isMiniPet && ch.charID < 0 && (ch.cTypePk == 5 || ch.cTypePk == 3 || ch.cTypePk == 4) && ch.cName != "Trọng tài" && !ch.cName.StartsWith("#") && !ch.cName.StartsWith("$");
 		}
 
 		// Token: 0x06000BC8 RID: 3016 RVA: 0x000AA9EC File Offset: 0x000A8BEC

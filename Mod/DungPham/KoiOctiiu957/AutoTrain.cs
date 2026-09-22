@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Mod.DungPham.KoiOctiiu957
@@ -107,9 +107,30 @@ namespace Mod.DungPham.KoiOctiiu957
 				}
 				break;
 			case 8:
-				AutoTrain.isAutoTrain = false;
-				global::Char.myCharz().mobFocus = null;
-				GameScr.info1.addInfo("Đã Tắt Auto Train!", 0);
+				if (AutoTrain.isAutoTrain)
+				{
+					AutoTrain.isAutoTrain = false;
+					global::Char.myCharz().mobFocus = null;
+					GameScr.isAutoPlay = false;
+					GameScr.info1.addInfo("Auto Train\n[STATUS: OFF]", 0);
+				}
+				else
+				{
+					if (AutoTrain.listMobIds.Count == 0)
+					{
+						for (int m = 0; m < GameScr.vMob.size(); m++)
+						{
+							Mob mob3 = (Mob)GameScr.vMob.elementAt(m);
+							if (mob3 != null && !mob3.isMobMe)
+							{
+								AutoTrain.listMobIds.Add(mob3.mobId);
+							}
+						}
+					}
+					AutoTrain.isAutoTrain = true;
+					GameScr.isAutoPlay = true;
+					GameScr.info1.addInfo("Auto Train\n[STATUS: ON]", 0);
+				}
 				return;
 			case 9:
 				if (AutoTrain.isGoBack)
@@ -166,6 +187,77 @@ namespace Mod.DungPham.KoiOctiiu957
 				ChatTextField.gI().tfChat.name = AutoTrain.inputMPPercentGoHome[1];
 				ChatTextField.gI().startChat2(AutoTrain.getInstance(), string.Empty);
 				return;
+			case 13:
+				AutoTrain.isAvoidBossInZone = !AutoTrain.isAvoidBossInZone;
+				Rms.saveRMSInt("isAvoidBossInZone", AutoTrain.isAvoidBossInZone ? 1 : 0);
+				GameScr.info1.addInfo("Né Boss Đổi Khu\n" + (AutoTrain.isAvoidBossInZone ? "[STATUS: ON]" : "[STATUS: OFF]"), 0);
+				return;
+			case 14:
+				AutoTrain.ShowMenuSelectSkills();
+				return;
+			case 140:
+				AutoTrain.listSelectedSkillTemplateIds.Clear();
+				for (int k = 0; k < GameScr.keySkill.Length; k++)
+				{
+					if (GameScr.keySkill[k] != null && GameScr.keySkill[k].template != null)
+					{
+						int tId = (int)GameScr.keySkill[k].template.id;
+						if (!AutoTrain.listSelectedSkillTemplateIds.Contains(tId))
+						{
+							AutoTrain.listSelectedSkillTemplateIds.Add(tId);
+						}
+					}
+				}
+				AutoTrain.SaveSkillData();
+				GameScr.info1.addInfo("Đã Bật Tất Cả Chiêu Up!", 0);
+				AutoTrain.ShowMenuSelectSkills();
+				return;
+			case 141:
+				AutoTrain.listSelectedSkillTemplateIds.Clear();
+				AutoTrain.listSelectedSkillTemplateIds.Add(-999);
+				AutoTrain.SaveSkillData();
+				GameScr.info1.addInfo("Đã Tắt Tất Cả Chiêu Up!", 0);
+				AutoTrain.ShowMenuSelectSkills();
+				return;
+			case 142:
+			{
+				int templateId = (int)p;
+				if (AutoTrain.listSelectedSkillTemplateIds.Contains(-999))
+				{
+					AutoTrain.listSelectedSkillTemplateIds.Remove(-999);
+				}
+				if (AutoTrain.listSelectedSkillTemplateIds.Count == 0)
+				{
+					for (int l = 0; l < GameScr.keySkill.Length; l++)
+					{
+						if (GameScr.keySkill[l] != null && GameScr.keySkill[l].template != null)
+						{
+							int tId2 = (int)GameScr.keySkill[l].template.id;
+							if (!AutoTrain.listSelectedSkillTemplateIds.Contains(tId2))
+							{
+								AutoTrain.listSelectedSkillTemplateIds.Add(tId2);
+							}
+						}
+					}
+				}
+				if (AutoTrain.listSelectedSkillTemplateIds.Contains(templateId))
+				{
+					AutoTrain.listSelectedSkillTemplateIds.Remove(templateId);
+					if (AutoTrain.listSelectedSkillTemplateIds.Count == 0)
+					{
+						AutoTrain.listSelectedSkillTemplateIds.Add(-999);
+					}
+					GameScr.info1.addInfo("Đã Tắt Chiêu Này!", 0);
+				}
+				else
+				{
+					AutoTrain.listSelectedSkillTemplateIds.Add(templateId);
+					GameScr.info1.addInfo("Đã Bật Chiêu Này!", 0);
+				}
+				AutoTrain.SaveSkillData();
+				AutoTrain.ShowMenuSelectSkills();
+				return;
+			}
 			default:
 				return;
 			}
@@ -175,11 +267,8 @@ namespace Mod.DungPham.KoiOctiiu957
 		public static void ShowMenu()
 		{
 			MyVector myVector = new MyVector();
+			myVector.addElement(new Command("Auto Train\n" + (AutoTrain.isAutoTrain ? "[STATUS: ON]" : "[STATUS: OFF]"), AutoTrain.getInstance(), 8, null));
 			List<Mob> list = new List<Mob>();
-			if (AutoTrain.isAutoTrain && !GameScr.canAutoPlay)
-			{
-				myVector.addElement(new Command("Tắt Auto Train", AutoTrain.getInstance(), 8, null));
-			}
 			for (int i = 0; i < GameScr.vMob.size(); i++)
 			{
 				Mob mob = (Mob)GameScr.vMob.elementAt(i);
@@ -210,6 +299,8 @@ namespace Mod.DungPham.KoiOctiiu957
 			}
 			myVector.addElement(new Command("Tàn Sát Tất Cả", AutoTrain.getInstance(), 2, null));
 			myVector.addElement(new Command("Tàn Sát Theo Vị Trí", AutoTrain.getInstance(), 3, null));
+			myVector.addElement(new Command("Chọn Chiêu Up\n[" + AutoTrain.GetSelectedSkillsCount().ToString() + " Chiêu]", AutoTrain.getInstance(), 14, null));
+			myVector.addElement(new Command("Né Boss Đổi Khu\n" + (AutoTrain.isAvoidBossInZone ? "[STATUS: ON]" : "[STATUS: OFF]"), AutoTrain.getInstance(), 13, null));
 			myVector.addElement(new Command("Né Siêu Quái\n" + (AutoTrain.isAvoidSuperMob ? "[STATUS: OFF]" : "[STATUS: ON]"), AutoTrain.getInstance(), 4, null));
 			myVector.addElement(new Command("Goback", AutoTrain.getInstance(), 5, null));
 			myVector.addElement(new Command("Clear Danh Sách Train", AutoTrain.getInstance(), 6, null));
@@ -294,14 +385,7 @@ namespace Mod.DungPham.KoiOctiiu957
 				AutoTrain.isAutoTrain = false;
 				return;
 			}
-			if (!GameScr.canAutoPlay)
-			{
-				AutoTrain.isAutoTrain = true;
-			}
-			else
-			{
-				AutoTrain.isAutoTrain = false;
-			}
+			AutoTrain.isAutoTrain = true;
 			GameScr.isAutoPlay = true;
 		}
 
@@ -314,6 +398,203 @@ namespace Mod.DungPham.KoiOctiiu957
 				"Nhập %MP",
 				"%MP"
 			};
+			AutoTrain.isAvoidBossInZone = (Rms.loadRMSInt("isAvoidBossInZone") == 1);
+			AutoTrain.LoadSkillData();
+		}
+
+		public static List<int> listSelectedSkillTemplateIds = new List<int>();
+
+		public static void LoadSkillData()
+		{
+			try
+			{
+				string saved = Rms.loadRMSString("AutoTrainSelectedSkills");
+				AutoTrain.listSelectedSkillTemplateIds.Clear();
+				if (!string.IsNullOrEmpty(saved))
+				{
+					string[] items = saved.Split(',');
+					foreach (string item in items)
+					{
+						int id;
+						if (int.TryParse(item.Trim(), out id))
+						{
+							if (!AutoTrain.listSelectedSkillTemplateIds.Contains(id))
+							{
+								AutoTrain.listSelectedSkillTemplateIds.Add(id);
+							}
+						}
+					}
+				}
+			}
+			catch { }
+		}
+
+		public static void SaveSkillData()
+		{
+			try
+			{
+				string saved = string.Join(",", AutoTrain.listSelectedSkillTemplateIds.ConvertAll<string>(delegate(int i) { return i.ToString(); }).ToArray());
+				Rms.saveRMSString("AutoTrainSelectedSkills", saved);
+			}
+			catch { }
+		}
+
+		public static bool IsSkillSelected(Skill skill)
+		{
+			if (skill == null || skill.template == null) return false;
+			if (AutoTrain.listSelectedSkillTemplateIds.Contains(-999)) return false;
+			if (AutoTrain.listSelectedSkillTemplateIds.Count == 0) return true;
+			return AutoTrain.listSelectedSkillTemplateIds.Contains((int)skill.template.id);
+		}
+
+		public static int GetSelectedSkillsCount()
+		{
+			if (AutoTrain.listSelectedSkillTemplateIds.Contains(-999)) return 0;
+			if (AutoTrain.listSelectedSkillTemplateIds.Count == 0)
+			{
+				int count = 0;
+				for (int i = 0; i < GameScr.keySkill.Length; i++)
+				{
+					if (GameScr.keySkill[i] != null) count++;
+				}
+				return count;
+			}
+			int countSelected = 0;
+			for (int i = 0; i < GameScr.keySkill.Length; i++)
+			{
+				if (GameScr.keySkill[i] != null && AutoTrain.listSelectedSkillTemplateIds.Contains((int)GameScr.keySkill[i].template.id))
+				{
+					countSelected++;
+				}
+			}
+			return countSelected;
+		}
+
+		public static void ShowMenuSelectSkills()
+		{
+			MyVector myVector = new MyVector();
+			myVector.addElement(new Command("Bật Tất Cả Chiêu", AutoTrain.getInstance(), 140, null));
+			myVector.addElement(new Command("Tắt Tất Cả Chiêu", AutoTrain.getInstance(), 141, null));
+
+			for (int i = 0; i < GameScr.keySkill.Length; i++)
+			{
+				Skill skill = GameScr.keySkill[i];
+				if (skill != null && skill.template != null)
+				{
+					bool isOn = AutoTrain.IsSkillSelected(skill);
+					string caption = string.Concat(new string[]
+					{
+						"[Ô ",
+						(i + 1).ToString(),
+						"] ",
+						skill.template.name,
+						"\n",
+						isOn ? "[STATUS: ON]" : "[STATUS: OFF]"
+					});
+					myVector.addElement(new Command(caption, AutoTrain.getInstance(), 142, (int)skill.template.id));
+				}
+			}
+			GameCanvas.menu.startAt(myVector, 3);
+		}
+
+		public static bool IsHarmlessBoss(string name)
+		{
+			if (string.IsNullOrEmpty(name))
+			{
+				return false;
+			}
+			string lower = name.ToLower().Trim();
+			string[] harmlessKeywords = new string[]
+			{
+				"ăn trộm", "an trom", "tên trộm", "ten trom", "kẻ trộm", "ke trom", "trộm",
+				"ở dơ", "o do",
+				"xinbato", "xin ba to",
+				"đường tăng", "duong tang", "đường tam tạng", "duong tam tang",
+				"héc quyn", "hẹc quynh", "héc-quyn", "hec quyn", "hecquyn", "sói héc", "sói hẹc",
+				"ngộ không", "ngo khong", "bát giới", "bat gioi", "sa tăng", "sa tang", "bạch long", "bach long",
+				"thỏ trắng", "tho trang", "thỏ đại ca", "tho dai ca", "thỏ xám", "thỏ ngọc",
+				"trọng tài", "trong tai", "bò mộng", "bo mong",
+				"tàu pảy pảy", "tau pay pay", "pảy pảy", "pay pay",
+				"người tuyết", "nguoi tuyet", "tuần lộc", "tuan loc", "ông già noel", "ong gia noel",
+				"bí ngô", "bi ngo", "bóng ma", "bong ma", "bong bóng", "ma trơi"
+			};
+			for (int i = 0; i < harmlessKeywords.Length; i++)
+			{
+				if (lower.Contains(harmlessKeywords[i]))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		public static bool HasBossInCurrentZone(out string bossName)
+		{
+			bossName = string.Empty;
+			if (GameScr.vCharInMap != null)
+			{
+				for (int i = 0; i < GameScr.vCharInMap.size(); i++)
+				{
+					global::Char c = (global::Char)GameScr.vCharInMap.elementAt(i);
+					if (c != null && !c.meDead && c.cHP > 0L && c.statusMe != 14 && c.statusMe != 5 && !c.isPet && !c.isMiniPet && MainMod.isBoss(c))
+					{
+						if (!IsHarmlessBoss(c.cName))
+						{
+							bossName = c.cName;
+							return true;
+						}
+					}
+				}
+			}
+			if (GameScr.vMob != null)
+			{
+				for (int j = 0; j < GameScr.vMob.size(); j++)
+				{
+					Mob mob = (Mob)GameScr.vMob.elementAt(j);
+					if (mob != null && mob.hp > 0L && mob.status != 0 && mob.status != 1)
+					{
+						if (mob is Assets.src.g.BigBoss || mob is BigBoss2 || mob is BachTuoc || mob is NewBoss)
+						{
+							string name = (mob.getTemplate() != null) ? mob.getTemplate().name : "Boss";
+							if (!IsHarmlessBoss(name))
+							{
+								bossName = name;
+								return true;
+							}
+						}
+					}
+				}
+			}
+			return false;
+		}
+
+		public static void AvoidBossChangeZone(string bossName)
+		{
+			if (global::Char.myCharz().meDead || global::Char.ischangingMap || Controller.isStopReadMessage)
+			{
+				return;
+			}
+			if (mSystem.currentTimeMillis() - AutoTrain.lastTimeChangeZoneAvoidBoss < 2000L)
+			{
+				return;
+			}
+			AutoTrain.lastTimeChangeZoneAvoidBoss = mSystem.currentTimeMillis();
+			global::Char.myCharz().mobFocus = null;
+			global::Char.myCharz().charFocus = null;
+			global::Char.myCharz().currentMovePoint = null;
+
+			int nextZone = TileMap.zoneID + 1;
+			int maxZone = (GameScr.gI().zones != null && GameScr.gI().zones.Length > 0) ? GameScr.gI().zones.Length : 20;
+			if (nextZone >= maxZone)
+			{
+				nextZone = 0;
+			}
+			Service.gI().requestChangeZone(nextZone, -1);
+			if (AutoTrain.isGoBack)
+			{
+				AutoTrain.gobackZoneID = nextZone;
+			}
+			GameScr.info1.addInfo("Phát hiện Boss [" + bossName + "]!\nNé sang Khu " + nextZone, 0);
 		}
 
 		// Token: 0x06000B3C RID: 2876 RVA: 0x000A5410 File Offset: 0x000A3610
@@ -342,8 +623,17 @@ namespace Mod.DungPham.KoiOctiiu957
 		// Token: 0x06000B3E RID: 2878 RVA: 0x000A54BC File Offset: 0x000A36BC
 		public static void Update()
 		{
-			if (GameScr.isAutoPlay && (GameScr.canAutoPlay || AutoTrain.isAutoTrain) && GameCanvas.gameTick % 20 == 0)
+			if (AutoTrain.isAutoTrain || (GameScr.isAutoPlay && GameScr.canAutoPlay))
 			{
+				if (AutoTrain.isAvoidBossInZone)
+				{
+					string bossName;
+					if (AutoTrain.HasBossInCurrentZone(out bossName))
+					{
+						AutoTrain.AvoidBossChangeZone(bossName);
+						return;
+					}
+				}
 				AutoTrain.DoIt();
 			}
 			if (global::Char.myCharz().cStamina <= 5 && GameCanvas.gameTick % 100 == 0)
@@ -402,46 +692,57 @@ namespace Mod.DungPham.KoiOctiiu957
 		}
 
 		// Token: 0x06000B3F RID: 2879 RVA: 0x000A5638 File Offset: 0x000A3838
-		private static Mob GetNextMob(int type)
+		private static Mob GetNextMob()
 		{
-			if (type == 1)
+			if (GameScr.vMob == null || GameScr.vMob.size() == 0)
 			{
-				long num = mSystem.currentTimeMillis();
-				Mob result = null;
-				for (int i = 0; i < AutoTrain.listMobIds.Count; i++)
-				{
-					Mob mob = (Mob)GameScr.vMob.elementAt(AutoTrain.listMobIds[i]);
-					long cTimeDie = mob.cTimeDie;
-					if (!mob.isMobMe && cTimeDie < num)
-					{
-						result = mob;
-						num = cTimeDie;
-					}
-				}
-				return result;
+				return null;
 			}
-			Mob result2 = null;
-			int num2 = 9999;
-			for (int j = 0; j < AutoTrain.listMobIds.Count; j++)
+			global::Char me = global::Char.myCharz();
+			if (me == null)
 			{
-				Mob mob2 = (Mob)GameScr.vMob.elementAt(AutoTrain.listMobIds[j]);
-				if (mob2.status != 0 && mob2.status != 1 && mob2.hp > 0L && !mob2.isMobMe && AutoTrain.isMeCanAttack(mob2))
+				return null;
+			}
+			Mob nearestMob = null;
+			int minDistance = int.MaxValue;
+			for (int i = 0; i < GameScr.vMob.size(); i++)
+			{
+				Mob mob = (Mob)GameScr.vMob.elementAt(i);
+				if (mob == null || mob.isMobMe || mob.hp <= 0L || mob.status == 0 || mob.status == 1)
 				{
-					int num3 = global::Math.abs(global::Char.myCharz().cx - mob2.x);
-					if (num2 > num3)
-					{
-						result2 = mob2;
-						num2 = num3;
-					}
+					continue;
+				}
+				if (AutoTrain.listMobIds.Count > 0 && !AutoTrain.listMobIds.Contains(mob.mobId))
+				{
+					continue;
+				}
+				if (!AutoTrain.isMeCanAttack(mob))
+				{
+					continue;
+				}
+				if (mob.x <= 0 || mob.y <= 0)
+				{
+					continue;
+				}
+				int dist = Res.abs(me.cx - mob.x) + Res.abs(me.cy - mob.y);
+				if (dist < minDistance)
+				{
+					minDistance = dist;
+					nearestMob = mob;
 				}
 			}
-			return result2;
+			return nearestMob;
 		}
+
+		private static long lastTimeAttackMob;
+		private static long lastTimeTeleportMob;
+		private static Skill lastSelectedSkill;
 
 		// Token: 0x06000B40 RID: 2880 RVA: 0x000A573C File Offset: 0x000A393C
 		private static void DoIt()
 		{
-			if ((!AutoTrain.isAutoTrain && !GameScr.canAutoPlay) || global::Char.myCharz().statusMe == 14 || global::Char.myCharz().statusMe == 5)
+			global::Char me = global::Char.myCharz();
+			if (me == null || me.meDead || me.cHP <= 0L || me.statusMe == 14 || me.statusMe == 5)
 			{
 				return;
 			}
@@ -455,19 +756,16 @@ namespace Mod.DungPham.KoiOctiiu957
 				AutoTrain.isAutoTrain = false;
 				return;
 			}
-			if (global::Char.myCharz().mobFocus != null && (global::Char.myCharz().mobFocus == null || !global::Char.myCharz().mobFocus.isMobMe))
+			if (me.mobFocus != null && (me.mobFocus.hp <= 0L || me.mobFocus.status == 1 || me.mobFocus.status == 0 || me.mobFocus.isMobMe || !AutoTrain.isMeCanAttack(me.mobFocus) || me.mobFocus.x <= 0 || me.mobFocus.y <= 0))
 			{
-				if (global::Char.myCharz().mobFocus.hp <= 0L || global::Char.myCharz().mobFocus.status == 1 || global::Char.myCharz().mobFocus.status == 0 || !AutoTrain.isMeCanAttack(global::Char.myCharz().mobFocus))
-				{
-					global::Char.myCharz().mobFocus = null;
-				}
+				me.mobFocus = null;
 			}
-			else
+			if (me.mobFocus == null)
 			{
 				if (!GameScr.canAutoPlay && AutoPick.isAutoPick)
 				{
 					AutoPick.FocusToNearestItem();
-					if (global::Char.myCharz().itemFocus != null)
+					if (me.itemFocus != null)
 					{
 						AutoPick.PickIt();
 						AutoPick.FocusToNearestItem();
@@ -475,66 +773,80 @@ namespace Mod.DungPham.KoiOctiiu957
 				}
 				else
 				{
-					global::Char.myCharz().itemFocus = null;
+					me.itemFocus = null;
 				}
-				if (global::Char.myCharz().itemFocus == null)
+				if (me.itemFocus == null)
 				{
-					Mob nextMob = AutoTrain.GetNextMob(0);
-					if (nextMob == null)
-					{
-						nextMob = AutoTrain.GetNextMob(1);
-						if (!GameScr.canAutoPlay)
-						{
-							global::Char.myCharz().currentMovePoint = new MovePoint(nextMob.xFirst, nextMob.yFirst);
-							global::Char.myCharz().endMovePointCommand = new Command(null, null, 8002, null);
-						}
-					}
-					else
-					{
-						global::Char.myCharz().mobFocus = nextMob;
-						if (GameScr.canAutoPlay)
-						{
-							global::Char.myCharz().cx = nextMob.x;
-							global::Char.myCharz().cy = nextMob.y;
-							Service.gI().charMove();
-						}
-					}
+					me.mobFocus = AutoTrain.GetNextMob();
 				}
 			}
-			if (global::Char.myCharz().mobFocus == null || (global::Char.myCharz().skillInfoPaint() != null && global::Char.myCharz().indexSkill < global::Char.myCharz().skillInfoPaint().Length && global::Char.myCharz().dart != null && global::Char.myCharz().arr != null))
+			if (me.mobFocus == null)
 			{
 				return;
 			}
-			if (global::Char.myCharz().mobFocus != null && GameScr.canAutoPlay && (global::Math.abs(global::Char.myCharz().mobFocus.x - global::Char.myCharz().cx) > 100 || global::Math.abs(global::Char.myCharz().mobFocus.y - global::Char.myCharz().cy) > 100) && mSystem.currentTimeMillis() - AutoTrain.lastTimeTeleportToMob > 100L)
+			Mob targetMob = me.mobFocus;
+			if (targetMob.hp <= 0L || targetMob.status == 0 || targetMob.status == 1 || targetMob.x <= 0 || targetMob.y <= 0)
 			{
-				AutoTrain.lastTimeTeleportToMob = mSystem.currentTimeMillis();
-				global::Char.myCharz().cx = global::Char.myCharz().mobFocus.x;
-				global::Char.myCharz().cy = global::Char.myCharz().mobFocus.y;
-				Service.gI().charMove();
+				me.mobFocus = null;
+				return;
+			}
+			int dist = Res.abs(me.cx - targetMob.x);
+			int distY = Res.abs(me.cy - targetMob.y);
+			if (dist > 30 || distY > 30)
+			{
+				if (mSystem.currentTimeMillis() - AutoTrain.lastTimeTeleportMob > 100L)
+				{
+					AutoTrain.lastTimeTeleportMob = mSystem.currentTimeMillis();
+					me.currentMovePoint = null;
+					me.cx = targetMob.x;
+					me.cy = targetMob.y;
+					me.cxSend = -1;
+					me.cySend = -1;
+					Service.gI().charMove();
+				}
 			}
 			Skill skill = null;
+			long now = mSystem.currentTimeMillis();
 			for (int i = 0; i < GameScr.keySkill.Length; i++)
 			{
-				if (GameScr.keySkill[i] != null && !GameScr.keySkill[i].paintCanNotUseSkill && GameScr.keySkill[i].template.id != 10 && GameScr.keySkill[i].template.id != 11 && GameScr.keySkill[i].template.id != 14 && GameScr.keySkill[i].template.id != 23 && GameScr.keySkill[i].template.id != 7 && GameScr.keySkill[i].template.id != 3 && GameScr.keySkill[i].template.id != 1 && GameScr.keySkill[i].template.id != 5 && GameScr.keySkill[i].template.id != 20 && GameScr.keySkill[i].template.id != 22 && GameScr.keySkill[i].template.id != 18 && GameScr.keySkill[i].template.id != 24 && GameScr.keySkill[i].template.id != 25 && GameScr.keySkill[i].template.id != 26 && ((global::Char.myCharz().cgender == 1 && (global::Char.myCharz().getSkill(global::Char.myCharz().nClass.skillTemplates[5]) == null || GameScr.keySkill[i].template.id != 2)) || (global::Char.myCharz().cgender == 0 && (global::Char.myCharz().getSkill(global::Char.myCharz().nClass.skillTemplates[3]) == null || GameScr.keySkill[i].template.id != 0))) && global::Char.myCharz().skillInfoPaint() == null)
+				Skill s = GameScr.keySkill[i];
+				if (s != null && s.template != null && !s.paintCanNotUseSkill && AutoTrain.IsSkillSelected(s))
 				{
-					int num = (int)((GameScr.keySkill[i].template.manaUseType == 2) ? 1L : ((GameScr.keySkill[i].template.manaUseType == 1) ? ((long)GameScr.keySkill[i].manaUse * global::Char.myCharz().cMPFull / 100L) : ((long)GameScr.keySkill[i].manaUse)));
-					if (global::Char.myCharz().cMP >= (long)num)
+					if (now - s.lastTimeUseThisSkill >= (long)s.coolDown)
 					{
-						if (skill == null)
+						int num = (int)((s.template.manaUseType == 2) ? 1L : ((s.template.manaUseType == 1) ? ((long)s.manaUse * me.cMPFull / 100L) : ((long)s.manaUse)));
+						if (me.cMP >= (long)num)
 						{
-							skill = GameScr.keySkill[i];
-						}
-						else if (skill.coolDown < GameScr.keySkill[i].coolDown)
-						{
-							skill = GameScr.keySkill[i];
+							if (skill == null)
+							{
+								skill = s;
+							}
+							else if (skill.coolDown < s.coolDown)
+							{
+								skill = s;
+							}
 						}
 					}
 				}
 			}
 			if (skill != null)
 			{
-				GameScr.gI().doSelectSkill(skill, true);
-				GameScr.gI().doDoubleClickToObj(global::Char.myCharz().mobFocus);
+				if (now - AutoTrain.lastTimeAttackMob >= 200L)
+				{
+					AutoTrain.lastTimeAttackMob = now;
+					skill.lastTimeUseThisSkill = now;
+					me.myskill = skill;
+					if (AutoTrain.lastSelectedSkill != skill)
+					{
+						AutoTrain.lastSelectedSkill = skill;
+						Service.gI().selectSkill((int)skill.template.id);
+					}
+					bool flag = TileMap.tileTypeAt(me.cx, me.cy, 2);
+					me.setSkillPaint(GameScr.sks[(int)skill.skillId], (!flag) ? 1 : 0);
+					MyVector myVector = new MyVector();
+					myVector.addElement(targetMob);
+					Service.gI().sendPlayerAttack(myVector, new MyVector(), 1);
+				}
 			}
 		}
 
@@ -564,6 +876,10 @@ namespace Mod.DungPham.KoiOctiiu957
 
 		// Token: 0x040015DA RID: 5594
 		public static bool isAutoTrain;
+
+		public static bool isAvoidBossInZone;
+
+		public static long lastTimeChangeZoneAvoidBoss;
 
 		// Token: 0x040015DB RID: 5595
 		private static int minimumMPGoHome;

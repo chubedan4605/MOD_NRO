@@ -202,6 +202,7 @@ public class ChatTextField : IActionListener
 		this.tfChat.setFocusWithKb(true);
 		this.to = to;
 		this.parentScreen = parentScreen;
+		this.lastChatTime = 0L;
 		if (Main.isWindowsPhone)
 		{
 			this.tfChat.showSubTextField = false;
@@ -250,30 +251,43 @@ public class ChatTextField : IActionListener
 		}
 		if (GameCanvas.isPointerJustRelease)
 		{
-			if (this.center != null && this.center.isPointerPressInside())
+			if (this.left != null && this.left.isPointerPressInside())
+			{
+				this.left.performAction();
+				GameCanvas.isPointerJustRelease = false;
+			}
+			else if (this.center != null && this.center.isPointerPressInside())
 			{
 				this.center.performAction();
+				GameCanvas.isPointerJustRelease = false;
+			}
+			else if (this.right != null && this.right.isPointerPressInside())
+			{
+				this.right.performAction();
 				GameCanvas.isPointerJustRelease = false;
 			}
 		}
 		if (Main.isPC)
 		{
-			if (GameCanvas.keyPressed[15])
+			if (GameCanvas.keyPressed[15] || GameCanvas.keyPressed[25] || GameCanvas.keyPressed[5])
 			{
-				if (this.left != null && this.tfChat.getText() != string.Empty)
+				if (this.left != null)
 				{
 					this.left.performAction();
 				}
 				GameCanvas.keyPressed[15] = false;
-				GameCanvas.keyPressed[(!Main.isPC) ? 5 : 25] = false;
+				GameCanvas.keyPressed[25] = false;
+				GameCanvas.keyPressed[5] = false;
 			}
-			if (GameCanvas.keyPressed[14])
+			if (GameCanvas.keyPressed[14] || GameCanvas.keyPressed[13] || GameCanvas.keyPressed[12])
 			{
 				if (this.right != null)
 				{
 					this.right.performAction();
 				}
 				GameCanvas.keyPressed[14] = false;
+				GameCanvas.keyPressed[13] = false;
+				GameCanvas.keyPressed[12] = false;
 			}
 		}
 	}
@@ -313,16 +327,13 @@ public class ChatTextField : IActionListener
 			Cout.LogError("perform chat 8000");
 			if (this.parentScreen != null)
 			{
-				long num = mSystem.currentTimeMillis();
-				if (num - this.lastChatTime < 1000L)
-				{
-					return;
-				}
-				this.lastChatTime = num;
-				this.parentScreen.onChatFromMe(this.tfChat.getText(), this.to);
+				this.lastChatTime = mSystem.currentTimeMillis();
+				string enteredText = this.tfChat.getText();
 				this.tfChat.setText(string.Empty);
 				this.right.caption = mResources.CLOSE;
 				this.tfChat.clearKb();
+				this.isShow = false;
+				this.parentScreen.onChatFromMe(enteredText, this.to);
 			}
 			break;
 		case 8001:

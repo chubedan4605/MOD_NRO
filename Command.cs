@@ -168,6 +168,14 @@ public class Command
 	// Token: 0x060002F3 RID: 755 RVA: 0x0001D57C File Offset: 0x0001B77C
 	public static void paintOngMau(Image img0, Image img1, Image img2, int x, int y, int size, mGraphics g)
 	{
+		if (img0 == null || img1 == null || img2 == null)
+		{
+			g.setColor(11837050);
+			g.fillRoundRect(x, y, size, 24, 6, 6);
+			g.setColor(4733734);
+			g.drawRoundRect(x, y, size, 24, 6, 6);
+			return;
+		}
 		for (int i = 10; i <= size - 20; i += 10)
 		{
 			g.drawImage(img1, x + i, y, 0);
