@@ -4446,6 +4446,7 @@ public class Panel : IActionListener, IChatable
 		g.translate(0, -this.cmy);
 		int[] zones = GameScr.gI().zones;
 		int[] pts = GameScr.gI().pts;
+		int btnW = 38;
 		for (int i = 0; i < pts.Length; i++)
 		{
 			int num = this.xScroll + 36;
@@ -4456,6 +4457,7 @@ public class Panel : IActionListener, IChatable
 			int y = this.yScroll + i * this.ITEM_HEIGHT;
 			int num5 = 34;
 			int h2 = this.ITEM_HEIGHT - 1;
+			int btnX = num + num3 - btnW;
 			if (num2 - this.cmy <= this.yScroll + this.hScroll && num2 - this.cmy >= this.yScroll - this.ITEM_HEIGHT)
 			{
 				g.setColor((i != this.selected) ? 15196114 : 16383818);
@@ -4472,7 +4474,36 @@ public class Panel : IActionListener, IChatable
 					{
 						mFont.tahoma_7_grey.drawString(g, zones[i] + string.Empty, num4 + num5 / 2, num2 + 6, mFont.CENTER);
 					}
-					mFont.tahoma_7_green2.drawString(g, GameScr.gI().numPlayer[i] + "/" + GameScr.gI().maxPlayer[i], num + 5, num2 + 6, 0);
+
+					bool isFull = (pts[i] == 1) || (GameScr.gI().numPlayer != null && GameScr.gI().maxPlayer != null && i < GameScr.gI().numPlayer.Length && i < GameScr.gI().maxPlayer.Length && GameScr.gI().numPlayer[i] >= GameScr.gI().maxPlayer[i]);
+					bool isAutoThis = Mod.DungPham.KoiOctiiu957.AutoZone.isAuto && Mod.DungPham.KoiOctiiu957.AutoZone.targetZone == zones[i];
+
+					string textZone = GameScr.gI().numPlayer[i] + "/" + GameScr.gI().maxPlayer[i];
+					if (isAutoThis)
+					{
+						textZone += " [Đang chờ vào khu...]";
+					}
+					else if (isFull)
+					{
+						textZone += " [Chọn để auto vào khu]";
+					}
+
+					mFont fontZone = isAutoThis ? mFont.tahoma_7b_red : (isFull ? mFont.tahoma_7_grey : mFont.tahoma_7_green2);
+					fontZone.drawString(g, textZone, num + 5, num2 + 6, 0);
+
+					// Draw Auto button on right
+					if (isAutoThis)
+					{
+						g.setColor(16733952); // Orange/Red for active
+						g.fillRect(btnX, num2, btnW, h);
+						mFont.tahoma_7b_white.drawString(g, "Hủy", btnX + btnW / 2, num2 + 6, mFont.CENTER);
+					}
+					else
+					{
+						g.setColor(2465778); // Blue
+						g.fillRect(btnX, num2, btnW, h);
+						mFont.tahoma_7_red.drawString(g, "Auto", btnX + btnW / 2, num2 + 6, mFont.CENTER);
+					}
 				}
 				if (GameScr.gI().rankName1[i] != null)
 				{
@@ -4482,14 +4513,14 @@ public class Panel : IActionListener, IChatable
 						"(Top ",
 						GameScr.gI().rank1[i],
 						")"
-					}), num + num3 - 2, num2 + 1, mFont.RIGHT);
+					}), num + num3 - btnW - 2, num2 + 1, mFont.RIGHT);
 					mFont.tahoma_7_grey.drawString(g, string.Concat(new object[]
 					{
 						GameScr.gI().rankName2[i],
 						"(Top ",
 						GameScr.gI().rank2[i],
 						")"
-					}), num + num3 - 2, num2 + 11, mFont.RIGHT);
+					}), num + num3 - btnW - 2, num2 + 11, mFont.RIGHT);
 				}
 			}
 		}
@@ -8967,14 +8998,42 @@ public class Panel : IActionListener, IChatable
 		this.cmx = (this.cmtoX = 0);
 	}
 
-	// Token: 0x06000968 RID: 2408 RVA: 0x000083C9 File Offset: 0x000065C9
 	private void doFireZone()
 	{
 		if (this.selected == -1)
 		{
 			return;
 		}
+		if (GameScr.gI().zones == null || this.selected < 0 || this.selected >= GameScr.gI().zones.Length)
+		{
+			return;
+		}
+
+		int zoneId = GameScr.gI().zones[this.selected];
+		bool isFull = (GameScr.gI().pts != null && this.selected < GameScr.gI().pts.Length && GameScr.gI().pts[this.selected] == 1)
+					|| (GameScr.gI().numPlayer != null && GameScr.gI().maxPlayer != null 
+						&& this.selected < GameScr.gI().numPlayer.Length && this.selected < GameScr.gI().maxPlayer.Length 
+						&& GameScr.gI().numPlayer[this.selected] >= GameScr.gI().maxPlayer[this.selected]);
+
+		int btnW = 38;
+		int btnX = this.xScroll + this.wScroll - btnW;
+		bool isClickAutoBtn = (GameCanvas.isTouch && GameCanvas.px >= btnX);
+
+		if (isClickAutoBtn || isFull)
+		{
+			Mod.DungPham.KoiOctiiu957.AutoZone.Toggle(zoneId);
+			if (GameCanvas.isTouch)
+			{
+				this.selected = -1;
+			}
+			return;
+		}
+
 		Res.outz("FIRE ZONE");
+		if (Mod.DungPham.KoiOctiiu957.AutoZone.isAuto)
+		{
+			Mod.DungPham.KoiOctiiu957.AutoZone.Stop();
+		}
 		this.isChangeZone = true;
 		GameCanvas.panel.hide();
 	}

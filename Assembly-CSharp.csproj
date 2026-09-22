@@ -175,6 +175,7 @@
     <Compile Include="Mod\DungPham\KoiOctiiu957\AutoPoint.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\AutoSkill.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\AutoTrain.cs" />
+    <Compile Include="Mod\DungPham\KoiOctiiu957\AutoZone.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\Boss.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\Hotkeys.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\MainMod.cs" />

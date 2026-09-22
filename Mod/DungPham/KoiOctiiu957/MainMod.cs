@@ -76,6 +76,7 @@ namespace Mod.DungPham.KoiOctiiu957
 				AutoPoint.Update();
 				AutoChat.Update();
 				AutoBoss.Update();
+				AutoZone.Update();
 				ModSkin.Update();
 
 				try
@@ -123,6 +124,11 @@ namespace Mod.DungPham.KoiOctiiu957
 			}), 25, startY, 0);
 			startY += 10;
 			mFont.tahoma_7.drawString(g, "Time: " + DateTime.Now.ToString("HH:mm:ss dd/MM/yyyy"), 25, startY, 0);
+			if (AutoZone.isAuto)
+			{
+				startY += 10;
+				mFont.tahoma_7b_red.drawString(g, "Đang chờ vào khu: " + AutoZone.targetZone, 25, startY, 0);
+			}
 			if (AutoBoss.isAutoAttackBoss)
 			{
 				startY += 10;
