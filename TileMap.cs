@@ -176,8 +176,7 @@ public class TileMap
 		}
 		catch (Exception ex)
 		{
-			Cout.println("Error Load Map");
-			GameMidlet.instance.exit();
+			Cout.println("Error Load Map: " + ex.Message);
 		}
 	}
 

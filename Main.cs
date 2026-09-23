@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net.NetworkInformation;
 using System.Threading;
@@ -385,29 +385,13 @@ public class Main : MonoBehaviour
 		}
 	}
 
-	// Token: 0x06000148 RID: 328 RVA: 0x0000E738 File Offset: 0x0000C938
 	private void OnApplicationPause(bool paused)
 	{
-		Main.isResume = false;
-		if (paused)
-		{
-			if (GameCanvas.isWaiting())
-			{
-				Main.isQuitApp = true;
-			}
-		}
-		else
-		{
-			Main.isResume = true;
-		}
+		Main.isResume = !paused;
 		if (global::TouchScreenKeyboard.visible)
 		{
 			TField.kb.active = false;
 			TField.kb = null;
-		}
-		if (Main.isQuitApp)
-		{
-			Application.Quit();
 		}
 	}
 

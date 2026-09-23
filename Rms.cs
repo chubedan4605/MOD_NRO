@@ -190,7 +190,19 @@ public class Rms
 	// Token: 0x06000093 RID: 147 RVA: 0x00004645 File Offset: 0x00002845
 	public static string GetiPhoneDocumentsPath()
 	{
-		return Application.persistentDataPath;
+		try
+		{
+			string localDir = Path.GetFullPath(Application.dataPath + "/../data_rms");
+			if (!Directory.Exists(localDir))
+			{
+				Directory.CreateDirectory(localDir);
+			}
+			return localDir;
+		}
+		catch
+		{
+			return Application.persistentDataPath;
+		}
 	}
 
 	// Token: 0x06000094 RID: 148 RVA: 0x0000AA88 File Offset: 0x00008C88
@@ -246,24 +258,33 @@ public class Rms
 
 	private static void __saveRMS(string filename, sbyte[] data)
 	{
-		string path = Rms.GetiPhoneDocumentsPath();
-		if (IsModCache(filename))
+		try
 		{
-			path = path + "/ModCache";
-			if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+			string path = Rms.GetiPhoneDocumentsPath();
+			if (IsModCache(filename))
+			{
+				path = path + "/ModCache";
+				if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+			}
+			string text = path + "/" + filename;
+			using (FileStream fileStream = new FileStream(text, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
+			{
+				byte[] raw = ArrayCast.cast(data);
+				fileStream.Write(raw, 0, raw.Length);
+				fileStream.Flush();
+			}
+			Main.setBackupIcloud(text);
 		}
-		string text = path + "/" + filename;
-		FileStream fileStream = new FileStream(text, FileMode.Create);
-		fileStream.Write(ArrayCast.cast(data), 0, data.Length);
-		fileStream.Flush();
-		fileStream.Close();
-		Main.setBackupIcloud(text);
+		catch (Exception ex)
+		{
+			Cout.println("Loi __saveRMS: " + ex.Message);
+		}
 	}
 
 	// Token: 0x06000095 RID: 149 RVA: 0x0000AAD0 File Offset: 0x00008CD0
 	private static sbyte[] __loadRMS(string filename)
 	{
-		sbyte[] result;
+		sbyte[] result = null;
 		try
 		{
 			string path = Rms.GetiPhoneDocumentsPath();
@@ -276,18 +297,20 @@ public class Rms
 				{
 					fullPath = modPath;
 				}
-				// If it doesn't exist in ModCache, it falls back to fullPath (root), 
-				// preserving user's old configs before the update!
 			}
-			FileStream fileStream = new FileStream(fullPath, FileMode.Open);
-			byte[] array = new byte[fileStream.Length];
-			fileStream.Read(array, 0, array.Length);
-			fileStream.Close();
-			sbyte[] array2 = ArrayCast.cast(array);
-			result = ArrayCast.cast(array);
+			if (File.Exists(fullPath))
+			{
+				using (FileStream fileStream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+				{
+					byte[] array = new byte[fileStream.Length];
+					fileStream.Read(array, 0, array.Length);
+					result = ArrayCast.cast(array);
+				}
+			}
 		}
 		catch (Exception ex)
 		{
+			Cout.println("Loi __loadRMS: " + ex.Message);
 			result = null;
 		}
 		return result;
