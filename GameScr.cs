@@ -2059,7 +2059,7 @@ public class GameScr : mScreen, IChatable
 							this.doSelectSkill(GameScr.keySkill[9], true);
 						}
 					}
-					else if (GameCanvas.keyAsciiPress == 114)
+					else if (GameCanvas.keyAsciiPress == 114 || GameCanvas.keyAsciiPress == 82)
 					{
 						ChatTextField.gI().startChat(this, string.Empty);
 					}

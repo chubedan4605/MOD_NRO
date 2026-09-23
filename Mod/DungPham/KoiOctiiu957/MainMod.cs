@@ -1336,33 +1336,66 @@ namespace Mod.DungPham.KoiOctiiu957
 				}
 				result = true;
 			}
-			else if (text.StartsWith("cheat_"))
+			else if (text.ToLower().StartsWith("cheat") || text.ToLower().StartsWith("speed") || text.ToLower().StartsWith("td"))
 			{
 				try
 				{
-					float num4 = Time.timeScale = float.Parse(text.Split(new char[]
+					string lower = text.ToLower().Trim();
+					if (lower.StartsWith("cheatf_"))
 					{
-						'_'
-					})[1]);
-					GameScr.info1.addInfo("Cheat: " + num4.ToString(), 0);
+						float num5 = Time.timeScale = float.Parse(lower.Split(new char[]
+						{
+							'_'
+						})[1], System.Globalization.CultureInfo.InvariantCulture) / 10f;
+						GameScr.info1.addInfo("Tốc độ game: " + num5.ToString("0.##") + "x", 0);
+						return true;
+					}
+
+					string valStr = string.Empty;
+					if (lower.StartsWith("cheat_") || lower.StartsWith("speed_") || lower.StartsWith("td_"))
+					{
+						valStr = lower.Substring(lower.IndexOf('_') + 1).Trim();
+					}
+					else if (lower.StartsWith("cheat ") || lower.StartsWith("speed ") || lower.StartsWith("td "))
+					{
+						valStr = lower.Substring(lower.IndexOf(' ') + 1).Trim();
+					}
+					else if (lower.StartsWith("cheat"))
+					{
+						valStr = lower.Substring(5).Trim();
+					}
+					else if (lower.StartsWith("speed"))
+					{
+						valStr = lower.Substring(5).Trim();
+					}
+					else if (lower.StartsWith("td"))
+					{
+						valStr = lower.Substring(2).Trim();
+					}
+
+					if (string.IsNullOrEmpty(valStr))
+					{
+						GameScr.info1.addInfo("Tốc độ hiện tại: " + Time.timeScale.ToString("0.##") + "x\nHD: Chat cheat[x] (VD: cheat2, cheat1.5)", 0);
+					}
+					else
+					{
+						valStr = valStr.Replace(',', '.');
+						float speed = float.Parse(valStr, System.Globalization.CultureInfo.InvariantCulture);
+						if (speed < 0.1f)
+						{
+							speed = 0.1f;
+						}
+						else if (speed > 50f)
+						{
+							speed = 50f;
+						}
+						Time.timeScale = speed;
+						GameScr.info1.addInfo("Tốc độ game: " + speed.ToString("0.##") + "x", 0);
+					}
 				}
 				catch
 				{
-				}
-				result = true;
-			}
-			else if (text.StartsWith("cheatf_"))
-			{
-				try
-				{
-					float num5 = Time.timeScale = float.Parse(text.Split(new char[]
-					{
-						'_'
-					})[1]) / 10f;
-					GameScr.info1.addInfo("Cheat: " + num5.ToString(), 0);
-				}
-				catch
-				{
+					GameScr.info1.addInfo("Tốc độ không hợp lệ! (VD: cheat2, cheat1.5)", 0);
 				}
 				result = true;
 			}
