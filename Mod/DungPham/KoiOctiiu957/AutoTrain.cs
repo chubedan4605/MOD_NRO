@@ -703,8 +703,8 @@ namespace Mod.DungPham.KoiOctiiu957
 			{
 				return null;
 			}
-			Mob nearestMob = null;
-			int minDistance = int.MaxValue;
+			Mob bestMob = null;
+			int bestScore = int.MaxValue;
 			for (int i = 0; i < GameScr.vMob.size(); i++)
 			{
 				Mob mob = (Mob)GameScr.vMob.elementAt(i);
@@ -725,13 +725,26 @@ namespace Mod.DungPham.KoiOctiiu957
 					continue;
 				}
 				int dist = Res.abs(me.cx - mob.x) + Res.abs(me.cy - mob.y);
-				if (dist < minDistance)
+				int score = dist;
+
+				// TOP PRIORITY: Quái vừa hồi sinh đầy máu 100% HP (ưu tiên pem trước khi người khác kịp chạm)
+				if (mob.hp >= mob.maxHp)
 				{
-					minDistance = dist;
-					nearestMob = mob;
+					score -= 2000;
+				}
+				else
+				{
+					// Nếu quái đã bị mất máu, trừ điểm theo tỷ lệ máu mất (tránh dồn vào quái sắp chết của người khác)
+					score += (int)((mob.maxHp - mob.hp) * 500L / (mob.maxHp > 0L ? mob.maxHp : 1L));
+				}
+
+				if (score < bestScore)
+				{
+					bestScore = score;
+					bestMob = mob;
 				}
 			}
-			return nearestMob;
+			return bestMob;
 		}
 
 		private static long lastTimeAttackMob;
@@ -790,21 +803,7 @@ namespace Mod.DungPham.KoiOctiiu957
 				me.mobFocus = null;
 				return;
 			}
-			int dist = Res.abs(me.cx - targetMob.x);
-			int distY = Res.abs(me.cy - targetMob.y);
-			if (dist > 30 || distY > 30)
-			{
-				if (mSystem.currentTimeMillis() - AutoTrain.lastTimeTeleportMob > 100L)
-				{
-					AutoTrain.lastTimeTeleportMob = mSystem.currentTimeMillis();
-					me.currentMovePoint = null;
-					me.cx = targetMob.x;
-					me.cy = targetMob.y;
-					me.cxSend = -1;
-					me.cySend = -1;
-					Service.gI().charMove();
-				}
-			}
+
 			Skill skill = null;
 			long now = mSystem.currentTimeMillis();
 			for (int i = 0; i < GameScr.keySkill.Length; i++)
@@ -831,7 +830,30 @@ namespace Mod.DungPham.KoiOctiiu957
 			}
 			if (skill != null)
 			{
-				if (now - AutoTrain.lastTimeAttackMob >= 200L)
+				int dist = Res.abs(me.cx - targetMob.x);
+				int distY = Res.abs(me.cy - targetMob.y);
+				int maxRangeX = (skill.dx > 0) ? skill.dx : 40;
+				int maxRangeY = (skill.dy > 0) ? skill.dy : 40;
+
+				// ZERO-LATENCY TELEPORT: Dịch chuyển ngay lập tức trong cùng 1 frame nếu ngoài tầm đánh
+				if (dist > maxRangeX - 10 || distY > maxRangeY - 10)
+				{
+					me.currentMovePoint = null;
+					me.cx = targetMob.x;
+					me.cy = targetMob.y;
+					me.cxSend = -1;
+					me.cySend = -1;
+					Service.gI().charMove();
+				}
+
+				long minAttackInterval = (skill.coolDown > 0) ? (long)skill.coolDown : 60L;
+				if (minAttackInterval < 60L)
+				{
+					minAttackInterval = 60L;
+				}
+
+				// GỬI LỆNH ĐÁNH NGAY LẬP TỨC (0ms delay)
+				if (now - AutoTrain.lastTimeAttackMob >= minAttackInterval)
 				{
 					AutoTrain.lastTimeAttackMob = now;
 					skill.lastTimeUseThisSkill = now;
@@ -841,11 +863,13 @@ namespace Mod.DungPham.KoiOctiiu957
 						AutoTrain.lastSelectedSkill = skill;
 						Service.gI().selectSkill((int)skill.template.id);
 					}
-					bool flag = TileMap.tileTypeAt(me.cx, me.cy, 2);
-					me.setSkillPaint(GameScr.sks[(int)skill.skillId], (!flag) ? 1 : 0);
+					
 					MyVector myVector = new MyVector();
 					myVector.addElement(targetMob);
 					Service.gI().sendPlayerAttack(myVector, new MyVector(), 1);
+
+					// Animation cancel: bỏ đóng băng hoạt ảnh để sẵn sàng nhịp kế tiếp
+					me.skillPaint = null;
 				}
 			}
 		}

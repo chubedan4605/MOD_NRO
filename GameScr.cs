@@ -3250,7 +3250,7 @@ public class GameScr : mScreen, IChatable
 				}
 			}
 		}
-		if (global::Char.myCharz().mobFocus == null || this.timeSkill != 0 || (global::Char.myCharz().skillInfoPaint() != null && global::Char.myCharz().indexSkill < global::Char.myCharz().skillInfoPaint().Length && global::Char.myCharz().dart != null && global::Char.myCharz().arr != null))
+		if (global::Char.myCharz().mobFocus == null || this.timeSkill != 0)
 		{
 			return;
 		}
@@ -3259,7 +3259,7 @@ public class GameScr : mScreen, IChatable
 		{
 			for (int m = 0; m < GameScr.onScreenSkill.Length; m++)
 			{
-				if (GameScr.keySkill[m] != null && !GameScr.keySkill[m].paintCanNotUseSkill && GameScr.keySkill[m].template.id != 10 && GameScr.keySkill[m].template.id != 11 && GameScr.keySkill[m].template.id != 14 && GameScr.keySkill[m].template.id != 23 && GameScr.keySkill[m].template.id != 7 && GameScr.keySkill[m].template.id != 3 && GameScr.keySkill[m].template.id != 1 && GameScr.keySkill[m].template.id != 5 && GameScr.keySkill[m].template.id != 20 && GameScr.keySkill[m].template.id != 22 && GameScr.keySkill[m].template.id != 18 && (global::Char.myCharz().cgender != 1 || (global::Char.myCharz().cgender == 1 && (global::Char.myCharz().getSkill(global::Char.myCharz().nClass.skillTemplates[5]) == null || (global::Char.myCharz().getSkill(global::Char.myCharz().nClass.skillTemplates[5]) != null && GameScr.keySkill[m].template.id != 2)))) && global::Char.myCharz().skillInfoPaint() == null && !GameScr.onScreenSkill[m].template.isSkillSpec())
+				if (GameScr.keySkill[m] != null && !GameScr.keySkill[m].paintCanNotUseSkill && GameScr.keySkill[m].template.id != 10 && GameScr.keySkill[m].template.id != 11 && GameScr.keySkill[m].template.id != 14 && GameScr.keySkill[m].template.id != 23 && GameScr.keySkill[m].template.id != 7 && GameScr.keySkill[m].template.id != 3 && GameScr.keySkill[m].template.id != 1 && GameScr.keySkill[m].template.id != 5 && GameScr.keySkill[m].template.id != 20 && GameScr.keySkill[m].template.id != 22 && GameScr.keySkill[m].template.id != 18 && (global::Char.myCharz().cgender != 1 || (global::Char.myCharz().cgender == 1 && (global::Char.myCharz().getSkill(global::Char.myCharz().nClass.skillTemplates[5]) == null || (global::Char.myCharz().getSkill(global::Char.myCharz().nClass.skillTemplates[5]) != null && GameScr.keySkill[m].template.id != 2)))) && !GameScr.onScreenSkill[m].template.isSkillSpec())
 				{
 					int num = (GameScr.onScreenSkill[m].template.manaUseType == 2) ? 1 : ((GameScr.onScreenSkill[m].template.manaUseType == 1) ? ((int)((long)GameScr.onScreenSkill[m].manaUse * global::Char.myCharz().cMPFull / 100L)) : GameScr.onScreenSkill[m].manaUse);
 					if (global::Char.myCharz().cMP >= (long)num)
@@ -3284,7 +3284,7 @@ public class GameScr : mScreen, IChatable
 		}
 		for (int n = 0; n < GameScr.keySkill.Length; n++)
 		{
-			if (GameScr.keySkill[n] != null && !GameScr.keySkill[n].paintCanNotUseSkill && GameScr.keySkill[n].template.id != 10 && GameScr.keySkill[n].template.id != 11 && GameScr.keySkill[n].template.id != 14 && GameScr.keySkill[n].template.id != 23 && GameScr.keySkill[n].template.id != 7 && global::Char.myCharz().skillInfoPaint() == null)
+			if (GameScr.keySkill[n] != null && !GameScr.keySkill[n].paintCanNotUseSkill && GameScr.keySkill[n].template.id != 10 && GameScr.keySkill[n].template.id != 11 && GameScr.keySkill[n].template.id != 14 && GameScr.keySkill[n].template.id != 23 && GameScr.keySkill[n].template.id != 7)
 			{
 				int num2 = (GameScr.keySkill[n].template.manaUseType == 2) ? 1 : ((GameScr.keySkill[n].template.manaUseType == 1) ? ((int)((long)GameScr.keySkill[n].manaUse * global::Char.myCharz().cMPFull / 100L)) : GameScr.keySkill[n].manaUse);
 				if (global::Char.myCharz().cMP >= (long)num2)
