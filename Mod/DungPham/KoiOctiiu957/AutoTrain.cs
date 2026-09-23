@@ -809,10 +809,11 @@ namespace Mod.DungPham.KoiOctiiu957
 			for (int i = 0; i < GameScr.keySkill.Length; i++)
 			{
 				Skill s = GameScr.keySkill[i];
-				if (s != null && s.template != null && !s.paintCanNotUseSkill && AutoTrain.IsSkillSelected(s))
+				if (s != null && s.template != null && AutoTrain.IsSkillSelected(s))
 				{
 					if (now - s.lastTimeUseThisSkill >= (long)s.coolDown)
 					{
+						s.paintCanNotUseSkill = false;
 						int num = (int)((s.template.manaUseType == 2) ? 1L : ((s.template.manaUseType == 1) ? ((long)s.manaUse * me.cMPFull / 100L) : ((long)s.manaUse)));
 						if (me.cMP >= (long)num)
 						{
@@ -846,13 +847,9 @@ namespace Mod.DungPham.KoiOctiiu957
 					Service.gI().charMove();
 				}
 
-				long minAttackInterval = (skill.coolDown > 0) ? (long)skill.coolDown : 60L;
-				if (minAttackInterval < 60L)
-				{
-					minAttackInterval = 60L;
-				}
+				long minAttackInterval = 100L;
 
-				// GỬI LỆNH ĐÁNH NGAY LẬP TỨC (0ms delay)
+				// GỬI LỆNH ĐÁNH NGAY LẬP TỨC (khi chiêu đã hồi xong)
 				if (now - AutoTrain.lastTimeAttackMob >= minAttackInterval)
 				{
 					AutoTrain.lastTimeAttackMob = now;
