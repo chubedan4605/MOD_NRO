@@ -92,6 +92,8 @@ namespace Mod.DungPham.KoiOctiiu957
 			case 6:
 				AutoTrain.listMobIds.Clear();
 				AutoTrain.isAutoTrain = false;
+				AutoTrain.isLockAir = false;
+				AutoTrain.lockAirY = 0;
 				GameScr.info1.addInfo("Đã Clear Danh Sách Train!", 0);
 				return;
 			case 7:
@@ -110,6 +112,8 @@ namespace Mod.DungPham.KoiOctiiu957
 				if (AutoTrain.isAutoTrain)
 				{
 					AutoTrain.isAutoTrain = false;
+					AutoTrain.isLockAir = false;
+					AutoTrain.lockAirY = 0;
 					global::Char.myCharz().mobFocus = null;
 					GameScr.isAutoPlay = false;
 					GameScr.info1.addInfo("Auto Train\n[STATUS: OFF]", 0);
@@ -194,6 +198,16 @@ namespace Mod.DungPham.KoiOctiiu957
 				return;
 			case 14:
 				AutoTrain.ShowMenuSelectSkills();
+				return;
+			case 15:
+				AutoTrain.isDisableSkill12Anim = !AutoTrain.isDisableSkill12Anim;
+				Rms.saveRMSInt("isDisableSkill12Anim", AutoTrain.isDisableSkill12Anim ? 1 : 0);
+				GameScr.info1.addInfo("Tắt Hoạt Ảnh Đánh/Chưởng\n" + (AutoTrain.isDisableSkill12Anim ? "[STATUS: ON]" : "[STATUS: OFF]"), 0);
+				return;
+			case 16:
+				AutoTrain.isAutoChangeZoneWhenNoMobs = !AutoTrain.isAutoChangeZoneWhenNoMobs;
+				Rms.saveRMSInt("isAutoChangeZoneWhenNoMobs", AutoTrain.isAutoChangeZoneWhenNoMobs ? 1 : 0);
+				GameScr.info1.addInfo("Đổi Khu Khi Hết Quái\n" + (AutoTrain.isAutoChangeZoneWhenNoMobs ? "[STATUS: ON]" : "[STATUS: OFF]"), 0);
 				return;
 			case 140:
 				AutoTrain.listSelectedSkillTemplateIds.Clear();
@@ -300,7 +314,9 @@ namespace Mod.DungPham.KoiOctiiu957
 			myVector.addElement(new Command("Tàn Sát Tất Cả", AutoTrain.getInstance(), 2, null));
 			myVector.addElement(new Command("Tàn Sát Theo Vị Trí", AutoTrain.getInstance(), 3, null));
 			myVector.addElement(new Command("Chọn Chiêu Up\n[" + AutoTrain.GetSelectedSkillsCount().ToString() + " Chiêu]", AutoTrain.getInstance(), 14, null));
+			myVector.addElement(new Command("Tắt Hoạt Ảnh Đánh/Chưởng\n" + (AutoTrain.isDisableSkill12Anim ? "[STATUS: ON]" : "[STATUS: OFF]"), AutoTrain.getInstance(), 15, null));
 			myVector.addElement(new Command("Né Boss Đổi Khu\n" + (AutoTrain.isAvoidBossInZone ? "[STATUS: ON]" : "[STATUS: OFF]"), AutoTrain.getInstance(), 13, null));
+			myVector.addElement(new Command("Đổi Khu Khi Hết Quái\n" + (AutoTrain.isAutoChangeZoneWhenNoMobs ? "[STATUS: ON]" : "[STATUS: OFF]"), AutoTrain.getInstance(), 16, null));
 			myVector.addElement(new Command("Né Siêu Quái\n" + (AutoTrain.isAvoidSuperMob ? "[STATUS: OFF]" : "[STATUS: ON]"), AutoTrain.getInstance(), 4, null));
 			myVector.addElement(new Command("Goback", AutoTrain.getInstance(), 5, null));
 			myVector.addElement(new Command("Clear Danh Sách Train", AutoTrain.getInstance(), 6, null));
@@ -399,8 +415,30 @@ namespace Mod.DungPham.KoiOctiiu957
 				"%MP"
 			};
 			AutoTrain.isAvoidBossInZone = (Rms.loadRMSInt("isAvoidBossInZone") == 1);
+			int savedAnim = Rms.loadRMSInt("isDisableSkill12Anim");
+			AutoTrain.isDisableSkill12Anim = (savedAnim != 0);
+			int savedChangeZone = Rms.loadRMSInt("isAutoChangeZoneWhenNoMobs");
+			AutoTrain.isAutoChangeZoneWhenNoMobs = (savedChangeZone != 0);
 			AutoTrain.LoadSkillData();
 		}
+
+		public static bool isDisableSkill12Anim = true;
+
+		public static bool isLockAir = false;
+
+		public static int lockAirY = 0;
+
+		public static bool isAutoChangeZoneWhenNoMobs = true;
+
+		public static long lastTimeChangeZoneNoMobs;
+
+		public static long timeNoMobsDetected;
+
+		public static long lastTimeZoneChanged;
+
+		public static int lastKnownZoneId = -1;
+
+		public static int lastKnownMapId = -1;
 
 		public static List<int> listSelectedSkillTemplateIds = new List<int>();
 
@@ -445,6 +483,83 @@ namespace Mod.DungPham.KoiOctiiu957
 			if (AutoTrain.listSelectedSkillTemplateIds.Contains(-999)) return false;
 			if (AutoTrain.listSelectedSkillTemplateIds.Count == 0) return true;
 			return AutoTrain.listSelectedSkillTemplateIds.Contains((int)skill.template.id);
+		}
+
+		public static bool IsSkill1OrSkill2(Skill skill)
+		{
+			if (!AutoTrain.isDisableSkill12Anim) return false;
+			if (skill == null || skill.template == null) return false;
+			int id = (int)skill.template.id;
+			return id >= 0 && id <= 5;
+		}
+
+		public static void PerformSkillWithoutAnimation(global::Char me, Skill skill, Mob targetMob)
+		{
+			if (me == null || skill == null || skill.template == null || targetMob == null)
+			{
+				return;
+			}
+			if (targetMob.hp <= 0L || targetMob.status == 0 || targetMob.status == 1)
+			{
+				return;
+			}
+			long now = mSystem.currentTimeMillis();
+			long cd = (skill.coolDown > 0) ? (long)skill.coolDown : 200L;
+			if (now - skill.lastTimeUseThisSkill < cd)
+			{
+				return;
+			}
+
+			int mana = (skill.template.manaUseType == 2) ? 1 : ((skill.template.manaUseType == 1) ? ((int)((long)skill.manaUse * me.cMPFull / 100L)) : skill.manaUse);
+			if (me.cMP < (long)mana)
+			{
+				return;
+			}
+
+			skill.lastTimeUseThisSkill = now;
+			skill.paintCanNotUseSkill = false;
+
+			if (skill.template.manaUseType == 2)
+			{
+				me.cMP = 1L;
+			}
+			else if (skill.template.manaUseType != 1)
+			{
+				me.cMP -= (long)skill.manaUse;
+			}
+			else
+			{
+				me.cMP -= (long)skill.manaUse * me.cMPFull / 100L;
+			}
+			if (me.cMP < 0L)
+			{
+				me.cMP = 0L;
+			}
+
+			me.cStamina--;
+			GameScr.gI().isInjureMp = true;
+			GameScr.gI().twMp = 0L;
+
+			me.skillPaint = null;
+			me.skillPaintRandomPaint = null;
+			me.dart = null;
+			me.arr = null;
+
+			if (GameScr.sks != null && (int)skill.skillId >= 0 && (int)skill.skillId < GameScr.sks.Length)
+			{
+				SkillPaint sp = GameScr.sks[(int)skill.skillId];
+				if (sp != null && sp.effectHappenOnMob > 0 && GameScr.efs != null && sp.effectHappenOnMob - 1 < GameScr.efs.Length)
+				{
+					me.effPaints = new EffectPaint[1];
+					me.effPaints[0] = new EffectPaint();
+					me.effPaints[0].effCharPaint = GameScr.efs[sp.effectHappenOnMob - 1];
+					me.effPaints[0].eMob = targetMob;
+				}
+			}
+
+			MyVector myVector = new MyVector();
+			myVector.addElement(targetMob);
+			Service.gI().sendPlayerAttack(myVector, new MyVector(), 1);
 		}
 
 		public static int GetSelectedSkillsCount()
@@ -595,6 +710,186 @@ namespace Mod.DungPham.KoiOctiiu957
 				AutoTrain.gobackZoneID = nextZone;
 			}
 			GameScr.info1.addInfo("Phát hiện Boss [" + bossName + "]!\nNé sang Khu " + nextZone, 0);
+		}
+
+		public static bool HasAliveTargetMobs()
+		{
+			if (GameScr.vMob == null || GameScr.vMob.size() == 0)
+			{
+				return false;
+			}
+			for (int i = 0; i < GameScr.vMob.size(); i++)
+			{
+				Mob mob = (Mob)GameScr.vMob.elementAt(i);
+				if (mob == null || mob.isMobMe || mob.hp <= 0L || mob.status == 0 || mob.status == 1)
+				{
+					continue;
+				}
+				if (AutoTrain.listMobIds.Count > 0 && !AutoTrain.listMobIds.Contains(mob.mobId))
+				{
+					continue;
+				}
+				if (!AutoTrain.isMeCanAttack(mob))
+				{
+					continue;
+				}
+				if (mob.x <= 0 || mob.y <= 0)
+				{
+					continue;
+				}
+				return true;
+			}
+			return false;
+		}
+
+		public static void CheckAndChangeZoneWhenNoMobs()
+		{
+			if (!AutoTrain.isAutoTrain || !AutoTrain.isAutoChangeZoneWhenNoMobs)
+			{
+				AutoTrain.timeNoMobsDetected = 0L;
+				return;
+			}
+			global::Char me = global::Char.myCharz();
+			if (me == null || me.meDead || me.cHP <= 0L || me.statusMe == 14 || me.statusMe == 5)
+			{
+				AutoTrain.timeNoMobsDetected = 0L;
+				return;
+			}
+			if (global::Char.ischangingMap || global::Char.isLoadingMap || Controller.isStopReadMessage)
+			{
+				AutoTrain.timeNoMobsDetected = 0L;
+				return;
+			}
+			if (TileMap.isOfflineMap() || TileMap.mapPhuBang())
+			{
+				AutoTrain.timeNoMobsDetected = 0L;
+				return;
+			}
+			if (GameScr.gI().zones != null && GameScr.gI().zones.Length <= 1)
+			{
+				AutoTrain.timeNoMobsDetected = 0L;
+				return;
+			}
+			if (GameScr.vMob == null || GameScr.vMob.size() == 0)
+			{
+				AutoTrain.timeNoMobsDetected = 0L;
+				return;
+			}
+
+			// Kiểm tra map có quái mục tiêu thuộc listMobIds không
+			if (AutoTrain.listMobIds.Count > 0)
+			{
+				bool hasAnyTargetInMap = false;
+				for (int i = 0; i < GameScr.vMob.size(); i++)
+				{
+					Mob m = (Mob)GameScr.vMob.elementAt(i);
+					if (m != null && !m.isMobMe && AutoTrain.listMobIds.Contains(m.mobId))
+					{
+						hasAnyTargetInMap = true;
+						break;
+					}
+				}
+				if (!hasAnyTargetInMap)
+				{
+					AutoTrain.timeNoMobsDetected = 0L;
+					return;
+				}
+			}
+
+			long now = mSystem.currentTimeMillis();
+
+			// Mới đổi khu / đổi map: chờ ít nhất 1.5s để server load quái xong
+			if (TileMap.zoneID != AutoTrain.lastKnownZoneId || TileMap.mapID != AutoTrain.lastKnownMapId)
+			{
+				AutoTrain.lastKnownZoneId = TileMap.zoneID;
+				AutoTrain.lastKnownMapId = TileMap.mapID;
+				AutoTrain.lastTimeZoneChanged = now;
+				AutoTrain.timeNoMobsDetected = 0L;
+				return;
+			}
+			if (now - AutoTrain.lastTimeZoneChanged < 1500L)
+			{
+				return;
+			}
+
+			// Nếu vẫn còn quái sống trong khu, reset thời gian
+			if (AutoTrain.HasAliveTargetMobs())
+			{
+				AutoTrain.timeNoMobsDetected = 0L;
+				return;
+			}
+
+			// Ghi nhận mốc thời gian phát hiện hết quái
+			if (AutoTrain.timeNoMobsDetected == 0L)
+			{
+				AutoTrain.timeNoMobsDetected = now;
+			}
+
+			// Chờ 600ms không có quái (để nhặt item và xác nhận quái chưa hồi sinh)
+			if (now - AutoTrain.timeNoMobsDetected >= 600L)
+			{
+				if (now - AutoTrain.lastTimeChangeZoneNoMobs >= 3000L)
+				{
+					AutoTrain.ChangeZoneWhenNoMobs();
+				}
+			}
+		}
+
+		public static void ChangeZoneWhenNoMobs()
+		{
+			global::Char me = global::Char.myCharz();
+			if (me == null || me.meDead || me.cHP <= 0L || me.statusMe == 14 || me.statusMe == 5)
+			{
+				return;
+			}
+			if (global::Char.ischangingMap || global::Char.isLoadingMap || Controller.isStopReadMessage)
+			{
+				return;
+			}
+			long now = mSystem.currentTimeMillis();
+			if (now - AutoTrain.lastTimeChangeZoneNoMobs < 3000L)
+			{
+				return;
+			}
+			AutoTrain.lastTimeChangeZoneNoMobs = now;
+			AutoTrain.timeNoMobsDetected = 0L;
+
+			me.mobFocus = null;
+			me.charFocus = null;
+			me.currentMovePoint = null;
+			AutoTrain.isLockAir = false;
+			AutoTrain.lockAirY = 0;
+
+			int maxZone = (GameScr.gI().zones != null && GameScr.gI().zones.Length > 0) ? GameScr.gI().zones.Length : 20;
+			int nextZone = (TileMap.zoneID + 1) % maxZone;
+
+			if (GameScr.gI().zones != null && GameScr.gI().zones.Length > 0 && GameScr.gI().numPlayer != null && GameScr.gI().maxPlayer != null && GameScr.gI().pts != null)
+			{
+				for (int i = 1; i < GameScr.gI().zones.Length; i++)
+				{
+					int candidate = (TileMap.zoneID + i) % GameScr.gI().zones.Length;
+					if (candidate < GameScr.gI().numPlayer.Length && candidate < GameScr.gI().maxPlayer.Length && candidate < GameScr.gI().pts.Length)
+					{
+						if (GameScr.gI().numPlayer[candidate] < GameScr.gI().maxPlayer[candidate] && GameScr.gI().pts[candidate] != 1)
+						{
+							nextZone = candidate;
+							break;
+						}
+					}
+				}
+			}
+
+			if (nextZone == TileMap.zoneID)
+			{
+				nextZone = (TileMap.zoneID + 1) % maxZone;
+			}
+
+			Service.gI().requestChangeZone(nextZone, -1);
+			if (AutoTrain.isGoBack)
+			{
+				AutoTrain.gobackZoneID = nextZone;
+			}
+			GameScr.info1.addInfo("Hết quái! Đổi sang Khu " + nextZone, 0);
 		}
 
 		// Token: 0x06000B3C RID: 2876 RVA: 0x000A5410 File Offset: 0x000A3610
@@ -757,6 +1052,14 @@ namespace Mod.DungPham.KoiOctiiu957
 			global::Char me = global::Char.myCharz();
 			if (me == null || me.meDead || me.cHP <= 0L || me.statusMe == 14 || me.statusMe == 5)
 			{
+				AutoTrain.isLockAir = false;
+				AutoTrain.lockAirY = 0;
+				return;
+			}
+			if (!Session_ME.gI().isConnected() || global::Char.ischangingMap)
+			{
+				AutoTrain.isLockAir = false;
+				AutoTrain.lockAirY = 0;
 				return;
 			}
 			if (AutoTrain.listMobIds.Count == 0)
@@ -767,11 +1070,15 @@ namespace Mod.DungPham.KoiOctiiu957
 					GameScr.info1.addInfo("Danh Sách Tàn Sát Trống!", 0);
 				}
 				AutoTrain.isAutoTrain = false;
+				AutoTrain.isLockAir = false;
+				AutoTrain.lockAirY = 0;
 				return;
 			}
 			if (me.mobFocus != null && (me.mobFocus.hp <= 0L || me.mobFocus.status == 1 || me.mobFocus.status == 0 || me.mobFocus.isMobMe || !AutoTrain.isMeCanAttack(me.mobFocus) || me.mobFocus.x <= 0 || me.mobFocus.y <= 0))
 			{
 				me.mobFocus = null;
+				AutoTrain.isLockAir = false;
+				AutoTrain.lockAirY = 0;
 			}
 			if (me.mobFocus == null)
 			{
@@ -795,23 +1102,38 @@ namespace Mod.DungPham.KoiOctiiu957
 			}
 			if (me.mobFocus == null)
 			{
+				AutoTrain.isLockAir = false;
+				AutoTrain.lockAirY = 0;
+				if (AutoTrain.isAutoChangeZoneWhenNoMobs)
+				{
+					AutoTrain.CheckAndChangeZoneWhenNoMobs();
+				}
 				return;
 			}
 			Mob targetMob = me.mobFocus;
 			if (targetMob.hp <= 0L || targetMob.status == 0 || targetMob.status == 1 || targetMob.x <= 0 || targetMob.y <= 0)
 			{
 				me.mobFocus = null;
+				AutoTrain.isLockAir = false;
+				AutoTrain.lockAirY = 0;
+				if (AutoTrain.isAutoChangeZoneWhenNoMobs)
+				{
+					AutoTrain.CheckAndChangeZoneWhenNoMobs();
+				}
 				return;
 			}
+
+			AutoTrain.timeNoMobsDetected = 0L;
 
 			Skill skill = null;
 			long now = mSystem.currentTimeMillis();
 			for (int i = 0; i < GameScr.keySkill.Length; i++)
 			{
 				Skill s = GameScr.keySkill[i];
-				if (s != null && s.template != null && AutoTrain.IsSkillSelected(s))
+				if (s != null && s.template != null && (s.template.isAttackSkill() || s.template.isSkillSpec()) && AutoTrain.IsSkillSelected(s))
 				{
-					if (now - s.lastTimeUseThisSkill >= (long)s.coolDown)
+					long sCoolDown = (s.coolDown > 0) ? (long)s.coolDown : 200L;
+					if (now - s.lastTimeUseThisSkill >= sCoolDown)
 					{
 						s.paintCanNotUseSkill = false;
 						int num = (int)((s.template.manaUseType == 2) ? 1L : ((s.template.manaUseType == 1) ? ((long)s.manaUse * me.cMPFull / 100L) : ((long)s.manaUse)));
@@ -829,44 +1151,142 @@ namespace Mod.DungPham.KoiOctiiu957
 					}
 				}
 			}
+			if (skill == null && me.myskill != null && me.myskill.template != null && me.myskill.template.isAttackSkill())
+			{
+				long sCoolDown = (me.myskill.coolDown > 0) ? (long)me.myskill.coolDown : 200L;
+				if (now - me.myskill.lastTimeUseThisSkill >= sCoolDown)
+				{
+					me.myskill.paintCanNotUseSkill = false;
+					skill = me.myskill;
+				}
+			}
+
 			if (skill != null)
 			{
-				int dist = Res.abs(me.cx - targetMob.x);
-				int distY = Res.abs(me.cy - targetMob.y);
-				int maxRangeX = (skill.dx > 0) ? skill.dx : 40;
-				int maxRangeY = (skill.dy > 0) ? skill.dy : 40;
+				bool isMelee = (skill.dx <= 60);
+				int maxRangeX = isMelee ? 35 : ((skill.dx > 0) ? skill.dx : 100);
+				int maxRangeY = isMelee ? 35 : ((skill.dy > 0) ? skill.dy : 60);
 
-				// ZERO-LATENCY TELEPORT: Dịch chuyển ngay lập tức trong cùng 1 frame nếu ngoài tầm đánh
-				if (dist > maxRangeX - 10 || distY > maxRangeY - 10)
+				int distX = Res.abs(me.cx - targetMob.x);
+				int distY = Res.abs(me.cy - targetMob.y);
+
+				int groundY = AutoMap.GetYGround(targetMob.x);
+				bool canHitFromGround = (groundY > 0 && Res.abs(groundY - targetMob.y) <= (maxRangeY - 10));
+
+				// Nếu nằm ngoài tầm đánh, di chuyển/teleport tới cạnh quái
+				if (distX > maxRangeX || distY > maxRangeY)
 				{
-					me.currentMovePoint = null;
-					me.cx = targetMob.x;
-					me.cy = targetMob.y;
-					me.cxSend = -1;
-					me.cySend = -1;
-					Service.gI().charMove();
+					if (now - AutoTrain.lastTimeTeleportMob > 100L)
+					{
+						AutoTrain.lastTimeTeleportMob = now;
+
+						int targetX = targetMob.x;
+						int targetY = targetMob.y;
+
+						if (isMelee)
+						{
+							int offsetX = (me.cx < targetMob.x) ? -24 : 24;
+							targetX = targetMob.x + offsetX;
+						}
+						else
+						{
+							int offsetX = (me.cx < targetMob.x) ? -(maxRangeX - 30) : (maxRangeX - 30);
+							targetX = targetMob.x + offsetX;
+						}
+
+						if (canHitFromGround)
+						{
+							targetY = groundY;
+							AutoTrain.isLockAir = false;
+							AutoTrain.lockAirY = 0;
+						}
+						else
+						{
+							targetY = targetMob.y;
+							AutoTrain.isLockAir = true;
+							AutoTrain.lockAirY = targetY;
+						}
+
+						if (distX > 200 || distY > 200)
+						{
+							AutoMap.TeleportTo(targetX, targetY);
+							if (AutoTrain.isLockAir)
+							{
+								me.cx = targetX;
+								me.cy = targetY;
+								me.statusMe = 4;
+								me.cvy = 0;
+								me.cvx = 0;
+								me.delayFall = 0;
+								me.cf = 8;
+							}
+						}
+						else
+						{
+							me.currentMovePoint = null;
+							me.cx = targetX;
+							me.cy = targetY;
+							me.cdir = (me.cx <= targetMob.x) ? 1 : -1;
+							me.statusMe = canHitFromGround ? 1 : 4;
+							me.cvy = 0;
+							me.cvx = 0;
+							me.delayFall = 0;
+							if (AutoTrain.isLockAir)
+							{
+								me.cf = 8;
+							}
+							me.cxSend = -1;
+							me.cySend = -1;
+							Service.gI().charMove();
+						}
+					}
+					return; // Vừa di chuyển xong, nhường frame kế tiếp tấn công để server sync vị trí
 				}
 
-				long minAttackInterval = 100L;
-
-				// GỬI LỆNH ĐÁNH NGAY LẬP TỨC (khi chiêu đã hồi xong)
-				if (now - AutoTrain.lastTimeAttackMob >= minAttackInterval)
+				// Đã ở trong cự ly đánh: quay mặt về phía quái
+				me.cdir = (me.cx <= targetMob.x) ? 1 : -1;
+				if (!canHitFromGround)
 				{
-					AutoTrain.lastTimeAttackMob = now;
-					skill.lastTimeUseThisSkill = now;
-					me.myskill = skill;
-					if (AutoTrain.lastSelectedSkill != skill)
+					AutoTrain.isLockAir = true;
+					if (AutoTrain.lockAirY <= 0)
 					{
-						AutoTrain.lastSelectedSkill = skill;
-						Service.gI().selectSkill((int)skill.template.id);
+						AutoTrain.lockAirY = me.cy;
 					}
-					
-					MyVector myVector = new MyVector();
-					myVector.addElement(targetMob);
-					Service.gI().sendPlayerAttack(myVector, new MyVector(), 1);
+					me.statusMe = 4;
+					me.cvy = 0;
+					me.cvx = 0;
+					me.delayFall = 0;
+				}
+				else
+				{
+					AutoTrain.isLockAir = false;
+					AutoTrain.lockAirY = 0;
+				}
 
-					// Animation cancel: bỏ đóng băng hoạt ảnh để sẵn sàng nhịp kế tiếp
-					me.skillPaint = null;
+				// Chuyển chiêu nếu khác chiêu đang chọn (đồng bộ myskill và gửi packet selectSkill, không gọi doSelectSkill gây đóng menu mod)
+				if (me.myskill != skill)
+				{
+					me.myskill = skill;
+					AutoTrain.lastSelectedSkill = skill;
+					GameScr.gI().lastSkill = skill;
+					Service.gI().selectSkill((int)skill.template.id);
+				}
+
+				// Tấn công: Nếu là Skill 1 hoặc Skill 2 thì tắt hoạt ảnh, gửi damage lập tức không delay
+				if (AutoTrain.IsSkill1OrSkill2(skill))
+				{
+					AutoTrain.PerformSkillWithoutAnimation(me, skill, targetMob);
+				}
+				else if (me.skillPaint == null)
+				{
+					if (skill.template.isSkillSpec())
+					{
+						me.sendNewAttack((short)skill.template.id);
+					}
+					else
+					{
+						GameScr.gI().doFire(false, true);
+					}
 				}
 			}
 		}

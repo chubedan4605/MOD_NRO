@@ -1095,7 +1095,14 @@ public class Char : IMapObject
 			}
 			if (this.dart != null)
 			{
-				this.dart.update();
+				if (this.me && Mod.DungPham.KoiOctiiu957.AutoTrain.isAutoTrain)
+				{
+					this.dart = null;
+				}
+				else
+				{
+					this.dart.update();
+				}
 			}
 			this.updateEffect();
 			if (this.holdEffID != 0)
@@ -2501,9 +2508,34 @@ public class Char : IMapObject
 		}
 	}
 
+	private bool checkLockAir()
+	{
+		if (this.me && Mod.DungPham.KoiOctiiu957.AutoTrain.isAutoTrain && Mod.DungPham.KoiOctiiu957.AutoTrain.isLockAir)
+		{
+			this.statusMe = 4;
+			this.cvx = 0;
+			this.cvy = 0;
+			this.delayFall = 0;
+			if (Mod.DungPham.KoiOctiiu957.AutoTrain.lockAirY > 0)
+			{
+				this.cy = Mod.DungPham.KoiOctiiu957.AutoTrain.lockAirY;
+			}
+			if (this.skillPaint == null)
+			{
+				this.cf = 8;
+			}
+			return true;
+		}
+		return false;
+	}
+
 	// Token: 0x06000644 RID: 1604 RVA: 0x00051D20 File Offset: 0x0004FF20
 	public void updateCharStand()
 	{
+		if (this.checkLockAir())
+		{
+			return;
+		}
 		this.isSoundJump = false;
 		this.isAttack = false;
 		this.isAttFly = false;
@@ -2657,6 +2689,10 @@ public class Char : IMapObject
 	// Token: 0x06000647 RID: 1607 RVA: 0x0005214C File Offset: 0x0005034C
 	public void updateCharRun()
 	{
+		if (this.checkLockAir())
+		{
+			return;
+		}
 		int num = ((int)this.isMonkey != 1 || this.me) ? 1 : 1;
 		if (this.cx >= GameScr.cmx && this.cx <= GameScr.cmx + GameCanvas.w)
 		{
@@ -2798,6 +2834,10 @@ public class Char : IMapObject
 	// Token: 0x0600064A RID: 1610 RVA: 0x00052550 File Offset: 0x00050750
 	public void updateCharJump()
 	{
+		if (this.checkLockAir())
+		{
+			return;
+		}
 		this.setMountIsStart();
 		this.ty = 0;
 		this.isFreez = false;
@@ -2944,6 +2984,10 @@ public class Char : IMapObject
 	// Token: 0x0600064C RID: 1612 RVA: 0x0005290C File Offset: 0x00050B0C
 	public void setCharFallFromJump()
 	{
+		if (this.checkLockAir())
+		{
+			return;
+		}
 		this.cyStartFall = this.cy;
 		this.cp1 = 0;
 		this.cp2 = 0;
@@ -2961,6 +3005,10 @@ public class Char : IMapObject
 	public void updateCharFall()
 	{
 		if (this.holder)
+		{
+			return;
+		}
+		if (this.checkLockAir())
 		{
 			return;
 		}
@@ -3142,6 +3190,10 @@ public class Char : IMapObject
 	// Token: 0x0600064E RID: 1614 RVA: 0x00052FC4 File Offset: 0x000511C4
 	public void updateCharFly()
 	{
+		if (this.checkLockAir())
+		{
+			return;
+		}
 		int num = ((int)this.isMonkey != 1 || this.me) ? 1 : 2;
 		this.setMountIsStart();
 		if (this.statusMe != 16 && (TileMap.tileTypeAt(this.cx, this.cy - this.ch + 24, 8192) || this.cy < 0))
@@ -3961,6 +4013,10 @@ public class Char : IMapObject
 		{
 			return;
 		}
+		if (this.me && Mod.DungPham.KoiOctiiu957.AutoTrain.isAutoTrain && Mod.DungPham.KoiOctiiu957.AutoTrain.isDisableSkill12Anim && this.myskill != null && this.myskill.template != null && Mod.DungPham.KoiOctiiu957.AutoTrain.IsSkill1OrSkill2(this.myskill))
+		{
+			return;
+		}
 		if (this.me && (int)this.myskill.template.id == 9 && this.cHP <= this.cHPFull / 10L)
 		{
 			return;
@@ -4594,7 +4650,7 @@ public class Char : IMapObject
 		{
 			this.arr.paint(g);
 		}
-		if (this.dart != null)
+		if (this.dart != null && (!this.me || !Mod.DungPham.KoiOctiiu957.AutoTrain.isAutoTrain))
 		{
 			this.dart.paint(g);
 		}
@@ -9657,7 +9713,7 @@ public class Char : IMapObject
 	private int chargeCount;
 
 	// Token: 0x04000C23 RID: 3107
-	private bool hasSendAttack;
+	public bool hasSendAttack;
 
 	// Token: 0x04000C24 RID: 3108
 	public bool isMabuHold;

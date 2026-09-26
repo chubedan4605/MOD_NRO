@@ -572,13 +572,16 @@ public class Controller : IMessageHandler
 					{
 						return;
 					}
-					if ((TileMap.tileTypeAtPixel(@char.cx, @char.cy) & 2) == 2)
+					if (num14 != global::Char.myCharz().charID)
 					{
-						@char.setSkillPaint(GameScr.sks[(int)b6], 0);
-					}
-					else
-					{
-						@char.setSkillPaint(GameScr.sks[(int)b6], 1);
+						if ((TileMap.tileTypeAtPixel(@char.cx, @char.cy) & 2) == 2)
+						{
+							@char.setSkillPaint(GameScr.sks[(int)b6], 0);
+						}
+						else
+						{
+							@char.setSkillPaint(GameScr.sks[(int)b6], 1);
+						}
 					}
 					Mob mob4 = GameScr.findMobInMap(mobId3);
 					if (@char.cx <= mob4.x)

@@ -8002,12 +8002,22 @@ public class Panel : IActionListener, IChatable
 	// Token: 0x06000956 RID: 2390 RVA: 0x0008BA90 File Offset: 0x00089C90
 	private void chatClan()
 	{
+		if (this.chatTField == null)
+		{
+			this.chatTField = new ChatTextField();
+			this.chatTField.tfChat.y = GameCanvas.h - 35 - ChatTextField.gI().tfChat.height;
+			this.chatTField.initChatTextField();
+		}
+		this.chatTField.parentScreen = this;
 		this.chatTField.strChat = mResources.chat_clan;
 		this.chatTField.tfChat.name = mResources.CHAT;
 		this.chatTField.to = string.Empty;
+		this.chatTField.tfChat.setText(string.Empty);
+		this.chatTField.tfChat.clearAll();
 		this.chatTField.isShow = true;
 		this.chatTField.tfChat.isFocus = true;
 		this.chatTField.tfChat.setIputType(TField.INPUT_TYPE_ANY);
+		this.chatTField.initChatTextField();
 		if (Main.isWindowsPhone)
 		{
 			this.chatTField.tfChat.strInfo = this.chatTField.strChat;
@@ -8021,11 +8031,21 @@ public class Panel : IActionListener, IChatable
 	// Token: 0x06000957 RID: 2391 RVA: 0x0008BB40 File Offset: 0x00089D40
 	public void creatClan()
 	{
+		if (this.chatTField == null)
+		{
+			this.chatTField = new ChatTextField();
+			this.chatTField.tfChat.y = GameCanvas.h - 35 - ChatTextField.gI().tfChat.height;
+			this.chatTField.initChatTextField();
+		}
+		this.chatTField.parentScreen = this;
 		this.chatTField.strChat = mResources.input_clan_name_to_create;
 		this.chatTField.tfChat.name = mResources.input_clan_name;
 		this.chatTField.to = string.Empty;
+		this.chatTField.tfChat.setText(string.Empty);
+		this.chatTField.tfChat.clearAll();
 		this.chatTField.isShow = true;
 		this.chatTField.tfChat.setIputType(TField.INPUT_TYPE_ANY);
+		this.chatTField.initChatTextField();
 		if (Main.isWindowsPhone)
 		{
 			this.chatTField.tfChat.strInfo = this.chatTField.strChat;
@@ -9695,10 +9715,21 @@ public class Panel : IActionListener, IChatable
 	// Token: 0x0600096E RID: 2414 RVA: 0x0008F428 File Offset: 0x0008D628
 	public void onChatFromMe(string text, string to)
 	{
-		if (this.chatTField.tfChat.getText() == null || this.chatTField.tfChat.getText().Equals(string.Empty) || text.Equals(string.Empty) || text == null)
+		if (string.IsNullOrEmpty(text))
 		{
-			this.chatTField.isShow = false;
+			if (this.chatTField != null)
+			{
+				this.chatTField.isShow = false;
+			}
 			return;
+		}
+		if (this.chatTField == null)
+		{
+			return;
+		}
+		if (this.chatTField.tfChat != null)
+		{
+			this.chatTField.tfChat.setText(text);
 		}
 		if (this.chatTField.strChat.Equals(mResources.input_clan_name))
 		{
@@ -9707,7 +9738,7 @@ public class Panel : IActionListener, IChatable
 			Service.gI().searchClan(text);
 			return;
 		}
-		if (this.chatTField.strChat.Equals(mResources.chat_clan))
+		if (this.chatTField.strChat.Equals(mResources.chat_clan) || this.chatTField.strChat.Equals("Chat bang") || this.chatTField.strChat.Equals("Chat clan") || this.chatTField.strChat.Equals("Clan chat"))
 		{
 			InfoDlg.showWait();
 			this.chatTField.isShow = false;

@@ -1336,6 +1336,30 @@ namespace Mod.DungPham.KoiOctiiu957
 				}
 				result = true;
 			}
+			else if (text.ToLower().Equals("adk") || text.ToLower().Equals("doikhu") || text.ToLower().Equals("dkq"))
+			{
+				AutoTrain.isAutoChangeZoneWhenNoMobs = !AutoTrain.isAutoChangeZoneWhenNoMobs;
+				Rms.saveRMSInt("isAutoChangeZoneWhenNoMobs", AutoTrain.isAutoChangeZoneWhenNoMobs ? 1 : 0);
+				GameScr.info1.addInfo("Đổi Khu Khi Hết Quái\n" + (AutoTrain.isAutoChangeZoneWhenNoMobs ? "[STATUS: ON]" : "[STATUS: OFF]"), 0);
+				result = true;
+			}
+			else if (text.StartsWith("c ") || text.StartsWith("clan ") || text.StartsWith("/c "))
+			{
+				string clanText = text.Substring(text.IndexOf(' ') + 1).Trim();
+				if (!string.IsNullOrEmpty(clanText))
+				{
+					if (global::Char.myCharz().clan == null)
+					{
+						GameScr.info1.addInfo("Bạn chưa vào bang hội!", 0);
+					}
+					else
+					{
+						Service.gI().clanMessage(0, clanText, -1);
+						GameScr.info1.addInfo("Đã gửi chat bang: " + clanText, 0);
+					}
+				}
+				result = true;
+			}
 			else if (text.ToLower().StartsWith("cheat") || text.ToLower().StartsWith("speed") || text.ToLower().StartsWith("td"))
 			{
 				try

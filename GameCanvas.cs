@@ -254,6 +254,7 @@ public class GameCanvas : IActionListener
 			{
 				GameCanvas.gameTick = 0;
 			}
+			ServerListScreen.AutoLoginUpdate();
 			if (GameCanvas.currentScreen != null)
 			{
 				if (GameCanvas.currentScreen == GameScr.gI() && !global::Char.isLoadingMap && Session_ME.gI().isConnected() && mSystem.currentTimeMillis() - GameCanvas.lastTimeKeepAlive > 15000L)
@@ -485,6 +486,8 @@ public class GameCanvas : IActionListener
 		Debug.LogError(">>>>onDisconnected");
 		if (GameCanvas.currentScreen != GameCanvas.serverScreen)
 		{
+			global::Char.clearMyChar();
+			GameScr.clearGameScr();
 			GameCanvas.serverScreen.switchToMe();
 			GameCanvas.startOK(mResources.maychutathoacmatsong + " [4]", 8884, null);
 		}
@@ -503,6 +506,7 @@ public class GameCanvas : IActionListener
 	// Token: 0x06000A80 RID: 2688 RVA: 0x0009D5B4 File Offset: 0x0009B7B4
 	public void onConnectionFail()
 	{
+		global::Char.clearMyChar();
 		if (Mod.DungPham.KoiOctiiu957.MainMod.isAutoLogin)
 		{
 			Mod.DungPham.KoiOctiiu957.MainMod.isDisconnecting = true;
@@ -2301,6 +2305,10 @@ public class GameCanvas : IActionListener
 		}
 		GameCanvas.paintShukiren(GameCanvas.hw, GameCanvas.h / 2 + 24, g);
 		mFont.tahoma_7b_white.drawString(g, text, GameCanvas.w / 2, GameCanvas.h / 2, 2);
+		if (ServerListScreen.isAutoLoginActive)
+		{
+			mFont.tahoma_7b_yellow.drawString(g, "Đang Auto Login (lần " + ServerListScreen.autoLoginRetryCount + ")...", GameCanvas.hw, 10, mFont.CENTER);
+		}
 	}
 
 	// Token: 0x06000AAB RID: 2731 RVA: 0x000A0334 File Offset: 0x0009E534
@@ -2970,11 +2978,18 @@ public class GameCanvas : IActionListener
 			return;
 		case 8884:
 			GameCanvas.endDlg();
-			if (GameCanvas.serverScr == null)
+			if (GameCanvas.currentScreen == GameCanvas.loginScr)
 			{
-				GameCanvas.serverScr = new ServerScr();
+				return;
 			}
-			GameCanvas.serverScr.switchToMe();
+			if (GameCanvas.serverScreen == null)
+			{
+				GameCanvas.serverScreen = new ServerListScreen();
+			}
+			if (GameCanvas.currentScreen != GameCanvas.serverScreen)
+			{
+				GameCanvas.serverScreen.switchToMe();
+			}
 			return;
 		case 8885:
 			GameMidlet.instance.exit();

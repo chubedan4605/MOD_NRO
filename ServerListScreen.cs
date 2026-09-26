@@ -118,32 +118,16 @@ public class ServerListScreen : mScreen, IActionListener
 		{
 			this.nCmdPlay = 1;
 		}
-		this.cmd = new Command[(mGraphics.zoomLevel <= 1) ? (4 + this.nCmdPlay) : (3 + this.nCmdPlay)];
+		this.cmd = new Command[(mGraphics.zoomLevel <= 1) ? (5 + this.nCmdPlay) : (4 + this.nCmdPlay)];
 		int num = GameCanvas.hh - 15 * this.cmd.Length + 28;
 		for (int i = 0; i < this.cmd.Length; i++)
 		{
 			switch (i)
 			{
 			case 0:
-				this.cmd[0] = new Command(string.Empty, this, 3, null);
-				if (text == null)
+				if (this.nCmdPlay == 1)
 				{
-					this.cmd[0].caption = mResources.playNew;
-					if (Rms.loadRMS("userAo" + ServerListScreen.ipSelect) != null)
-					{
-						this.cmd[0].caption = mResources.choitiep;
-					}
-				}
-				else if (text.Equals(string.Empty))
-				{
-					this.cmd[0].caption = mResources.playNew;
-					if (Rms.loadRMS("userAo" + ServerListScreen.ipSelect) != null)
-					{
-						this.cmd[0].caption = mResources.choitiep;
-					}
-				}
-				else
-				{
+					this.cmd[0] = new Command(string.Empty, this, 3, null);
 					this.cmd[0].caption = mResources.playAcc + ": " + text;
 					if (this.cmd[0].caption.Length > 23)
 					{
@@ -152,40 +136,59 @@ public class ServerListScreen : mScreen, IActionListener
 						command.caption += "...";
 					}
 				}
+				else
+				{
+					this.cmd[0] = new Command(ServerListScreen.isAutoLoginActive ? "Dừng Auto Login" : "Auto Login", this, 20001, null);
+				}
 				break;
 			case 1:
 				if (this.nCmdPlay == 1)
 				{
-					this.cmd[1] = new Command(string.Empty, this, 10100, null);
-					this.cmd[1].caption = mResources.playNew;
+					this.cmd[1] = new Command(ServerListScreen.isAutoLoginActive ? "Dừng Auto Login" : "Auto Login", this, 20001, null);
 				}
 				else
 				{
-					this.cmd[1] = new Command(mResources.change_account, this, 7, null);
+					this.cmd[1] = new Command(string.Empty, this, 3, null);
+					this.cmd[1].caption = mResources.playNew;
+					if (Rms.loadRMS("userAo" + ServerListScreen.ipSelect) != null)
+					{
+						this.cmd[1].caption = mResources.choitiep;
+					}
 				}
 				break;
 			case 2:
 				if (this.nCmdPlay == 1)
 				{
-					this.cmd[2] = new Command(mResources.change_account, this, 7, null);
+					this.cmd[2] = new Command(string.Empty, this, 10100, null);
+					this.cmd[2].caption = mResources.playNew;
 				}
 				else
 				{
-					this.cmd[2] = new Command(string.Empty, this, 17, null);
+					this.cmd[2] = new Command(mResources.change_account, this, 7, null);
 				}
 				break;
 			case 3:
 				if (this.nCmdPlay == 1)
 				{
-					this.cmd[3] = new Command(string.Empty, this, 17, null);
+					this.cmd[3] = new Command(mResources.change_account, this, 7, null);
 				}
 				else
 				{
-					this.cmd[3] = new Command(mResources.option, this, 8, null);
+					this.cmd[3] = new Command(string.Empty, this, 17, null);
 				}
 				break;
 			case 4:
-				this.cmd[4] = new Command(mResources.option, this, 8, null);
+				if (this.nCmdPlay == 1)
+				{
+					this.cmd[4] = new Command(string.Empty, this, 17, null);
+				}
+				else
+				{
+					this.cmd[4] = new Command(mResources.option, this, 8, null);
+				}
+				break;
+			case 5:
+				this.cmd[5] = new Command(mResources.option, this, 8, null);
 				break;
 			}
 			this.cmd[i].y = num;
@@ -346,7 +349,7 @@ public class ServerListScreen : mScreen, IActionListener
 					this.cmd[i].paint(g);
 				}
 				g.setClip(0, 0, GameCanvas.w, GameCanvas.h);
-				int serverBtnIndex = 2 + this.nCmdPlay;
+				int serverBtnIndex = 3 + this.nCmdPlay;
 				if (serverBtnIndex >= 0 && serverBtnIndex < this.cmd.Length && this.cmd[serverBtnIndex] != null)
 				{
 					bool isConnected = ServerListScreen.isServerOnline || Session_ME.gI().isConnected();
@@ -356,6 +359,10 @@ public class ServerListScreen : mScreen, IActionListener
 					ServerListScreen.paintConnectionDot(g, btnDotX, btnDotY, isConnected);
 				}
 			}
+		}
+		if (ServerListScreen.isAutoLoginActive)
+		{
+			mFont.tahoma_7b_yellow.drawString(g, "Đang Auto Login (lần " + ServerListScreen.autoLoginRetryCount + ")...", GameCanvas.hw, 5, mFont.CENTER);
 		}
 		base.paint(g);
 	}
@@ -535,7 +542,7 @@ public class ServerListScreen : mScreen, IActionListener
 		{
 			if (GameCanvas.keyPressed[8])
 			{
-				int num2 = (mGraphics.zoomLevel <= 1) ? 4 : 2;
+				int num2 = this.cmd.Length - 1;
 				GameCanvas.keyPressed[8] = false;
 				ServerListScreen.selected++;
 				if (ServerListScreen.selected > num2)
@@ -546,7 +553,7 @@ public class ServerListScreen : mScreen, IActionListener
 			}
 			if (GameCanvas.keyPressed[2])
 			{
-				int num3 = (mGraphics.zoomLevel <= 1) ? 4 : 2;
+				int num3 = this.cmd.Length - 1;
 				GameCanvas.keyPressed[2] = false;
 				ServerListScreen.selected--;
 				if (ServerListScreen.selected < 0)
@@ -703,13 +710,14 @@ public class ServerListScreen : mScreen, IActionListener
 		ServerListScreen.loadScreen = true;
 		GameCanvas.loadBG(0);
 		ServerListScreen.bigOk = true;
-		this.cmd[2 + this.nCmdPlay].caption = mResources.server + ": " + ServerListScreen.nameServer[ServerListScreen.ipSelect];
+		this.cmd[3 + this.nCmdPlay].caption = mResources.server + ": " + ServerListScreen.nameServer[ServerListScreen.ipSelect];
 		this.center = new Command(string.Empty, this, this.cmd[ServerListScreen.selected].idAction, null);
-		this.cmd[1 + this.nCmdPlay].caption = mResources.change_account;
-		if (this.cmd.Length == 4 + this.nCmdPlay)
+		this.cmd[2 + this.nCmdPlay].caption = mResources.change_account;
+		if (this.cmd.Length == 5 + this.nCmdPlay)
 		{
-			this.cmd[3 + this.nCmdPlay].caption = mResources.option;
+			this.cmd[4 + this.nCmdPlay].caption = mResources.option;
 		}
+		global::Char.clearMyChar();
 		global::Char.isLoadingMap = false;
 		mSystem.resetCurInapp();
 		base.switchToMe();
@@ -726,13 +734,15 @@ public class ServerListScreen : mScreen, IActionListener
 		ServerListScreen.loadScreen = true;
 		GameCanvas.loadBG(0);
 		ServerListScreen.bigOk = true;
-		this.cmd[2 + this.nCmdPlay].caption = mResources.server + ": " + ServerListScreen.nameServer[ServerListScreen.ipSelect];
+		this.cmd[3 + this.nCmdPlay].caption = mResources.server + ": " + ServerListScreen.nameServer[ServerListScreen.ipSelect];
 		this.center = new Command(string.Empty, this, this.cmd[ServerListScreen.selected].idAction, null);
-		this.cmd[1 + this.nCmdPlay].caption = mResources.change_account;
-		if (this.cmd.Length == 4 + this.nCmdPlay)
+		this.cmd[2 + this.nCmdPlay].caption = mResources.change_account;
+		if (this.cmd.Length == 5 + this.nCmdPlay)
 		{
-			this.cmd[3 + this.nCmdPlay].caption = mResources.option;
+			this.cmd[4 + this.nCmdPlay].caption = mResources.option;
 		}
+		global::Char.clearMyChar();
+		global::Char.isLoadingMap = false;
 		mSystem.resetCurInapp();
 		base.switchToMe();
 	}
@@ -802,6 +812,37 @@ public class ServerListScreen : mScreen, IActionListener
 				}
 				ServerListScreen.isGetData = true;
 			}
+		}
+		if (idAction == 20001)
+		{
+			ServerListScreen.isAutoLoginActive = !ServerListScreen.isAutoLoginActive;
+			if (ServerListScreen.isAutoLoginActive)
+			{
+				GameCanvas.endDlg();
+				global::Char.clearMyChar();
+				global::Char.isLoadingMap = false;
+				ServerListScreen.lastTimeAutoLogin = mSystem.currentTimeMillis();
+				ServerListScreen.autoLoginRetryCount = 1;
+				ServerListScreen.hasSentSelectChar = false;
+				ServerListScreen.lastTimeSelectChar = 0L;
+				ServerListScreen.isWaitingLoginResponse = true;
+				GameScr.info1.addInfo("BẬT Auto Login - Đang kết nối...", 0);
+				this.Login_New();
+			}
+			else
+			{
+				GameCanvas.endDlg();
+				global::Char.clearMyChar();
+				global::Char.isLoadingMap = false;
+				ServerListScreen.hasSentSelectChar = false;
+				ServerListScreen.isWaitingLoginResponse = false;
+				GameScr.info1.addInfo("ĐÃ TẮT Auto Login", 0);
+				if (GameCanvas.currentScreen != this)
+				{
+					this.switchToMe();
+				}
+			}
+			this.initCommand();
 		}
 		if (idAction == 3)
 		{
@@ -1518,5 +1559,190 @@ public class ServerListScreen : mScreen, IActionListener
 	public static void UpdateServerCheck()
 	{
 		ServerListScreen.isServerOnline = Session_ME.gI().isConnected();
+	}
+
+	public static bool isAutoLoginActive;
+
+	public static long lastTimeAutoLogin;
+
+	public static int autoLoginRetryCount;
+
+	public static bool hasSentSelectChar;
+
+	public static long lastTimeSelectChar;
+
+	public static bool isWaitingLoginResponse;
+
+	public static void AutoLoginUpdate()
+	{
+		if (!ServerListScreen.isAutoLoginActive)
+		{
+			return;
+		}
+
+		long now = mSystem.currentTimeMillis();
+
+		// 1. ĐÃ VÀO GAME THÀNH CÔNG (chỉ khi đang ở màn hình GameScr, đã hết tải map và nạp Char hợp lệ)
+		if (GameCanvas.currentScreen is GameScr && !global::Char.isLoadingMap && global::Char.myCharz() != null && global::Char.myCharz().charID > 0)
+		{
+			ServerListScreen.isAutoLoginActive = false;
+			ServerListScreen.isWaitingLoginResponse = false;
+			ServerListScreen.hasSentSelectChar = false;
+			ServerListScreen.autoLoginRetryCount = 0;
+			GameScr.info1.addInfo("Auto Login thành công!", 0);
+			if (GameCanvas.serverScreen != null)
+			{
+				GameCanvas.serverScreen.initCommand();
+			}
+			return;
+		}
+
+		// 2. MÀN HÌNH CHỌN NHÂN VẬT (ChooseCharScr - nếu server có giao diện chọn nhân vật)
+		if (GameCanvas.currentScreen is ChooseCharScr chooseScr)
+		{
+			if (ChooseCharScr.playerData != null && ChooseCharScr.playerData.Length > 0)
+			{
+				if (!ServerListScreen.hasSentSelectChar || now - ServerListScreen.lastTimeSelectChar > 6000L)
+				{
+					ServerListScreen.hasSentSelectChar = true;
+					ServerListScreen.lastTimeSelectChar = now;
+					ServerListScreen.lastTimeAutoLogin = now;
+					int targetFocus = (chooseScr.focus >= 0 && chooseScr.focus < ChooseCharScr.playerData.Length) ? chooseScr.focus : 0;
+					GameCanvas.startWaitDlg();
+					Service.gI().finishUpdate(ChooseCharScr.playerData[targetFocus].playerID);
+				}
+			}
+			return;
+		}
+
+		// 3. XỬ LÝ HỘP THOẠI (Dialog)
+		if (GameCanvas.currentDialog != null)
+		{
+			if (GameCanvas.currentDialog is MsgDlg msgDlg)
+			{
+				string allText = string.Empty;
+				if (msgDlg.info != null)
+				{
+					for (int i = 0; i < msgDlg.info.Length; i++)
+					{
+						if (msgDlg.info[i] != null)
+						{
+							allText += msgDlg.info[i] + " ";
+						}
+					}
+				}
+				allText = allText.ToLower();
+
+				// Các lỗi sai thông tin / khóa nick / vi phạm -> DỪNG NGAY Auto Login để tránh bị khóa IP/tài khoản
+				if (allText.Contains("không chính xác") || 
+				    allText.Contains("không đúng") || 
+				    allText.Contains("sai thông tin") || 
+				    allText.Contains("nhiều lần") || 
+				    allText.Contains("bị khóa") || 
+				    allText.Contains("banned") || 
+				    allText.Contains("chưa kích hoạt"))
+				{
+					ServerListScreen.isAutoLoginActive = false;
+					ServerListScreen.isWaitingLoginResponse = false;
+					ServerListScreen.autoLoginRetryCount = 0;
+					if (GameCanvas.serverScreen != null)
+					{
+						GameCanvas.serverScreen.initCommand();
+					}
+					return;
+				}
+
+				// Hộp thoại đang chờ (Xin chờ, Đang tải...) -> Chờ phản hồi
+				if (allText.Contains("chờ") || allText.Contains("wait") || allText.Contains("đang tải"))
+				{
+					if (now - ServerListScreen.lastTimeAutoLogin > 12000L)
+					{
+						GameCanvas.endDlg();
+						global::Char.isLoadingMap = false;
+						ServerListScreen.isWaitingLoginResponse = false;
+						ServerListScreen.lastTimeAutoLogin = now;
+						if (GameCanvas.serverScreen != null)
+						{
+							GameCanvas.serverScreen.switchToMe();
+						}
+					}
+					return;
+				}
+
+				// Các hộp thoại báo lỗi mất kết nối / quá tải server -> Đóng sau 1.5s và quay lại server list để retry
+				if (allText.Contains("quá tải") || allText.Contains("mất sóng") || allText.Contains("mất kết nối") || allText.Contains("không thể kết nối") || allText.Contains("bảo trì") || allText.Contains("thử lại"))
+				{
+					if (now - ServerListScreen.lastTimeAutoLogin > 1500L)
+					{
+						GameCanvas.endDlg();
+						global::Char.isLoadingMap = false;
+						ServerListScreen.isWaitingLoginResponse = false;
+						ServerListScreen.lastTimeAutoLogin = now;
+						if (GameCanvas.serverScreen != null)
+						{
+							GameCanvas.serverScreen.switchToMe();
+						}
+					}
+					return;
+				}
+			}
+		}
+
+		// 4. KIỂM TRA TRẠNG THÁI ĐANG CHỜ PHẢN HỒI TỪ SERVER
+		if (ServerListScreen.isWaitingLoginResponse)
+		{
+			// Nếu mất kết nối socket
+			if (!Session_ME.gI().isConnected() && !Session_ME.connecting)
+			{
+				if (now - ServerListScreen.lastTimeAutoLogin > 1500L)
+				{
+					GameCanvas.endDlg();
+					global::Char.isLoadingMap = false;
+					ServerListScreen.isWaitingLoginResponse = false;
+					ServerListScreen.lastTimeAutoLogin = now;
+					if (GameCanvas.serverScreen != null)
+					{
+						GameCanvas.serverScreen.switchToMe();
+					}
+				}
+				return;
+			}
+
+			// Nếu server im lặng quá 12 giây -> Timeout, dọn dẹp kết nối và chuẩn bị thử lại
+			if (now - ServerListScreen.lastTimeAutoLogin > 12000L)
+			{
+				Session_ME.gI().close();
+				GameCanvas.endDlg();
+				global::Char.isLoadingMap = false;
+				ServerListScreen.isWaitingLoginResponse = false;
+				ServerListScreen.lastTimeAutoLogin = now;
+				if (GameCanvas.serverScreen != null)
+				{
+					GameCanvas.serverScreen.switchToMe();
+				}
+				return;
+			}
+
+			// Đang chờ phản hồi hợp lệ từ server, TUYỆT ĐỐI KHÔNG gửi đè request!
+			return;
+		}
+
+		// 5. GỬI REQUEST ĐĂNG NHẬP RETRY (Chỉ gửi khi KHÔNG đang chờ và đã qua ít nhất 2.5 giây)
+		if (now - ServerListScreen.lastTimeAutoLogin > 2500L)
+		{
+			ServerListScreen.lastTimeAutoLogin = now;
+			ServerListScreen.autoLoginRetryCount++;
+			ServerListScreen.isWaitingLoginResponse = true;
+			ServerListScreen.hasSentSelectChar = false;
+
+			if (GameCanvas.serverScreen != null)
+			{
+				GameCanvas.serverScreen.Login_New();
+			}
+			else if (GameCanvas.loginScr != null)
+			{
+				GameCanvas.loginScr.doLogin();
+			}
+		}
 	}
 }

@@ -1774,7 +1774,10 @@ public class GameScr : mScreen, IChatable
 	// Token: 0x06000749 RID: 1865 RVA: 0x00065100 File Offset: 0x00063300
 	public void resetButton()
 	{
-		GameCanvas.menu.showMenu = false;
+		if (!Mod.DungPham.KoiOctiiu957.AutoTrain.isAutoTrain && !GameScr.isAutoPlay)
+		{
+			GameCanvas.menu.showMenu = false;
+		}
 		ChatTextField.gI().close();
 		ChatTextField.gI().center = null;
 		this.isLockKey = false;
@@ -3308,7 +3311,7 @@ public class GameScr : mScreen, IChatable
 	}
 
 	// Token: 0x06000763 RID: 1891 RVA: 0x00068200 File Offset: 0x00066400
-	private void doFire(bool isFireByShortCut, bool skipWaypoint)
+	public void doFire(bool isFireByShortCut, bool skipWaypoint)
 	{
 		GameScr.tam++;
 		Waypoint waypoint = global::Char.myCharz().isInEnterOfflinePoint();
@@ -4558,8 +4561,11 @@ public class GameScr : mScreen, IChatable
 			global::Char.myCharz().paint(g);
 			if (global::Char.myCharz().skillPaint != null && global::Char.myCharz().skillInfoPaint() != null && global::Char.myCharz().indexSkill < global::Char.myCharz().skillInfoPaint().Length)
 			{
-				global::Char.myCharz().paintCharWithSkill(g);
-				global::Char.myCharz().paintMount2(g);
+				if (!Mod.DungPham.KoiOctiiu957.AutoTrain.isAutoTrain || !Mod.DungPham.KoiOctiiu957.AutoTrain.IsSkill1OrSkill2(global::Char.myCharz().myskill))
+				{
+					global::Char.myCharz().paintCharWithSkill(g);
+					global::Char.myCharz().paintMount2(g);
+				}
 			}
 			for (int num5 = 0; num5 < GameScr.vCharInMap.size(); num5++)
 			{
@@ -8396,7 +8402,7 @@ public class GameScr : mScreen, IChatable
 	private int selectedIndexSkill = -1;
 
 	// Token: 0x04000E44 RID: 3652
-	private Skill lastSkill;
+	public Skill lastSkill;
 
 	// Token: 0x04000E45 RID: 3653
 	private bool doSeleckSkillFlag;

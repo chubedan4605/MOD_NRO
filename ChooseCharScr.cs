@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 // Token: 0x020000A4 RID: 164
 public class ChooseCharScr : mScreen, IActionListener
@@ -143,7 +143,7 @@ public class ChooseCharScr : mScreen, IActionListener
 	};
 
 	// Token: 0x04000CBF RID: 3263
-	private int focus;
+	public int focus;
 
 	// Token: 0x04000CC0 RID: 3264
 	private int[] cy = new int[2];

@@ -127,6 +127,14 @@ public class ChatTextField : IActionListener
 	{
 		if (this.isShow)
 		{
+			if (keyCode == 10 || keyCode == 13 || keyCode == -5)
+			{
+				if (this.left != null)
+				{
+					this.left.performAction();
+					return;
+				}
+			}
 			this.tfChat.keyPressed(keyCode);
 		}
 		if (this.tfChat.getText().Equals(string.Empty))
@@ -329,11 +337,11 @@ public class ChatTextField : IActionListener
 			{
 				this.lastChatTime = mSystem.currentTimeMillis();
 				string enteredText = this.tfChat.getText();
-				this.tfChat.setText(string.Empty);
 				this.right.caption = mResources.CLOSE;
 				this.tfChat.clearKb();
 				this.isShow = false;
 				this.parentScreen.onChatFromMe(enteredText, this.to);
+				this.tfChat.setText(string.Empty);
 			}
 			break;
 		case 8001:

@@ -999,7 +999,7 @@ namespace Mod.DungPham.KoiOctiiu957
 		}
 
 		// Token: 0x06000B04 RID: 2820 RVA: 0x000A343C File Offset: 0x000A163C
-		private static int GetYGround(int x)
+		public static int GetYGround(int x)
 		{
 			int limitY = (TileMap.pxh > 0) ? TileMap.pxh : 1000;
 			for (int y = 24; y < limitY; y += 24)
