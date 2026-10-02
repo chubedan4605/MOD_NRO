@@ -1454,6 +1454,19 @@ public class Panel : IActionListener, IChatable
 		{
 			return;
 		}
+		
+		bool isShowToolInfo = false;
+		if (this.type == 0 && this.currentTabIndex == 4) isShowToolInfo = true;
+		if (this.type == 19 || this.type == 20 || this.type == 22) isShowToolInfo = true;
+		if (isShowToolInfo)
+		{
+			Mod.DungPham.KoiOctiiu957.ZoomMod.UpdateSlider(this.X);
+			if (Mod.DungPham.KoiOctiiu957.ZoomMod.isDragging)
+			{
+				GameCanvas.clearAllPointerEvent();
+				return;
+			}
+		}
 		if (this.cmdClose.isPointerPressInside())
 		{
 			this.cmdClose.performAction();
@@ -5782,6 +5795,7 @@ public class Panel : IActionListener, IChatable
 			": ",
 			text
 		}), 60, 27, mFont.LEFT, mFont.tahoma_7_grey);
+		Mod.DungPham.KoiOctiiu957.ZoomMod.PaintSlider(g, this.X);
 	}
 
 	// Token: 0x06000927 RID: 2343 RVA: 0x00086D9C File Offset: 0x00084F9C

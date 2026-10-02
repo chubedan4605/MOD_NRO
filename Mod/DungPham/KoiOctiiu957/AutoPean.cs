@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Mod.DungPham.KoiOctiiu957
 {
@@ -270,16 +270,8 @@ namespace Mod.DungPham.KoiOctiiu957
 		public static void ShowMenu()
 		{
 			AutoPean.LoadData();
-			MyVector myVector = new MyVector();
-			myVector.addElement(new Command("Xin Đậu\n" + (AutoPean.isAutoRequestPean ? "[STATUS: ON]" : "[STATUS: OFF]"), AutoPean.getInstance(), 1, null));
-			myVector.addElement(new Command("Cho Đậu\n" + (AutoPean.isAutoDonatePean ? "[STATUS: ON]" : "[STATUS: OFF]"), AutoPean.getInstance(), 2, null));
-			myVector.addElement(new Command("Thu Đậu\n" + (AutoPean.isAutoHarvestPean ? "[STATUS: ON]" : "[STATUS: OFF]"), AutoPean.getInstance(), 3, null));
-			myVector.addElement(new Command("Ăn Đậu Khi HP Dưới: " + NinjaUtil.getMoneys((long)AutoPean.minimumHP) + "HP", AutoPean.getInstance(), 4, null));
-			myVector.addElement(new Command("Ăn Đậu Khi HP Dưới: " + AutoPean.minimumHPPercent + "%", AutoPean.getInstance(), 5, null));
-			myVector.addElement(new Command("Ăn Đậu Khi MP Dưới: " + NinjaUtil.getMoneys((long)AutoPean.minimumMP) + "MP", AutoPean.getInstance(), 6, null));
-			myVector.addElement(new Command("Ăn Đậu Khi MP Dưới: " + AutoPean.minimumMPPercent + "%", AutoPean.getInstance(), 7, null));
-			myVector.addElement(new Command("Lưu Cài Đặt\n" + (AutoPean.isSaveData ? "[STATUS: ON]" : "[STATUS: OFF]"), AutoPean.getInstance(), 8, null));
-			GameCanvas.menu.startAt(myVector, 3);
+			AutoPeanDlg dlg = new AutoPeanDlg();
+			dlg.show();
 		}
 
 		// Token: 0x06000B78 RID: 2936 RVA: 0x000A78E4 File Offset: 0x000A5AE4
@@ -464,19 +456,19 @@ namespace Mod.DungPham.KoiOctiiu957
 		public static bool isAutoHarvestPean;
 
 		// Token: 0x04001631 RID: 5681
-		private static int minimumHPPercent;
+		public static int minimumHPPercent;
 
 		// Token: 0x04001632 RID: 5682
-		private static int minimumMPPercent;
+		public static int minimumMPPercent;
 
 		// Token: 0x04001633 RID: 5683
-		private static int minimumHP;
+		public static int minimumHP;
 
 		// Token: 0x04001634 RID: 5684
-		private static int minimumMP;
+		public static int minimumMP;
 
 		// Token: 0x04001635 RID: 5685
-		private static bool isSaveData;
+		public static bool isSaveData;
 
 		// Token: 0x04001636 RID: 5686
 		private static string[] inputHPPercent = new string[]

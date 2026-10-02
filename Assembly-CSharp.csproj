@@ -170,11 +170,14 @@
     <Compile Include="Mod\DungPham\KoiOctiiu957\AutoItem.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\AutoMap.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\AutoPean.cs" />
+    <Compile Include="Mod\DungPham\KoiOctiiu957\AutoPeanDlg.cs" />
+    <Compile Include="Mod\DungPham\KoiOctiiu957\ZoomMod.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\ModSkin.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\AutoPick.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\AutoPoint.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\AutoSkill.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\AutoTrain.cs" />
+    <Compile Include="Mod\DungPham\KoiOctiiu957\SkillSelectDlg.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\AutoZone.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\Boss.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\Hotkeys.cs" />

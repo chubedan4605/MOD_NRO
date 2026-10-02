@@ -181,7 +181,7 @@ namespace Mod.DungPham.KoiOctiiu957
 
 			int id = mob.templateId;
 			// Quái thường luyện tập / up sức mạnh (không phải Boss)
-			if ((id >= 0 && id <= 24) || // Mộc nhân -> Quỷ mập (bao gồm 19: Heo rừng mẹ, 20: Heo xanh mẹ, 21: Alien)
+			if ((id >= 0 && id <= 27) || // Mộc nhân -> Akkuman
 				(id >= 28 && id <= 38) || // Thằn lằn bay 2 -> Robot thép
 				(id >= 43 && id <= 66) || // Thằn lằn xanh -> Tai tím (bao gồm Khỉ lông đen/vàng, Xên con 1-8)
 				id == 69 || // Da xanh
@@ -221,14 +221,12 @@ namespace Mod.DungPham.KoiOctiiu957
 
 			int id = mob.templateId;
 			// Danh sách Mob Boss chính thức trong NRO:
-			// 25: Tambourine, 26: Drum, 27: Akkuman
 			// 39: Nappa, 40: Soldier, 41: Appule, 42: Raspberry
 			// 67: Abo, 68: Kado
 			// 70: Hirudegarn, 71: Vua Bạch Tuộc, 72: Rôbốt bảo vệ, 77: Gấu tướng cướp
 			// 82: Voi Chín Ngà, 83: Gà Chín Cựa, 84: Ngựa Chín Mao, 85: Piano
 			// 92: Godzilla, 93: Kong
-			if (id == 25 || id == 26 || id == 27 ||
-				(id >= 39 && id <= 42) ||
+			if ((id >= 39 && id <= 42) ||
 				id == 67 || id == 68 ||
 				id == 70 || id == 71 || id == 72 || id == 77 ||
 				id == 82 || id == 83 || id == 84 || id == 85 ||
@@ -287,28 +285,92 @@ namespace Mod.DungPham.KoiOctiiu957
 
 		private static void StickAndAttackChar(global::Char me, global::Char boss)
 		{
+			int maxRangeX = 35;
+			int maxRangeY = 35;
+			if (me.myskill != null && me.myskill.template != null)
+			{
+				bool isMelee = (me.myskill.template.type == 1);
+				maxRangeX = isMelee ? 35 : ((me.myskill.dx > 0) ? me.myskill.dx : 60);
+				maxRangeY = isMelee ? 35 : ((me.myskill.dy > 0) ? me.myskill.dy : 60);
+			}
+
 			int distX = Res.abs(me.cx - boss.cx);
 			int distY = Res.abs(me.cy - boss.cy);
 
-			// Bám sát Boss: Nếu cách xa hơn 30px thì dịch chuyển ngay tới cạnh Boss
-			if (distX > 30 || distY > 30)
+			// Bám sát Boss: Nếu cách xa hơn maxRange thì dịch chuyển ngay tới cạnh Boss
+			if (distX > maxRangeX || distY > maxRangeY)
 			{
 				if (mSystem.currentTimeMillis() - lastTimeTeleportBoss > 150L)
 				{
 					lastTimeTeleportBoss = mSystem.currentTimeMillis();
-					if (distX > 200 || distY > 200)
+					
+					int targetX = boss.cx;
+					int targetY = boss.cy;
+
+					int groundY = AutoMap.GetYGround(targetX);
+					bool canHitFromGround = (groundY > 0 && Res.abs(groundY - boss.cy) <= (maxRangeY - 10));
+
+					if (canHitFromGround)
 					{
-						AutoMap.TeleportTo(boss.cx, boss.cy);
+						targetY = groundY;
+						AutoTrain.isLockAir = false;
+						AutoTrain.lockAirY = 0;
 					}
 					else
 					{
-						me.cx = boss.cx;
-						me.cy = boss.cy;
+						targetY = boss.cy;
+						AutoTrain.isLockAir = true;
+						AutoTrain.lockAirY = targetY;
+					}
+
+					if (distX > 200 || distY > 200)
+					{
+						AutoMap.TeleportTo(targetX, targetY);
+					}
+					else
+					{
+						me.cx = targetX;
+						me.cy = targetY;
 						me.statusMe = 3;
 						me.cxSend = -1;
 						me.cySend = -1;
 						Service.gI().charMove();
 					}
+					
+					if (AutoTrain.isLockAir)
+					{
+						me.statusMe = 4;
+						me.cf = 8;
+					}
+					else if (canHitFromGround)
+					{
+						me.statusMe = 1;
+					}
+				}
+			}
+			else
+			{
+				int groundYHere = AutoMap.GetYGround(me.cx);
+				bool canHitFromGroundHere = (groundYHere > 0 && Res.abs(groundYHere - boss.cy) <= (maxRangeY - 10));
+				if (!canHitFromGroundHere)
+				{
+					AutoTrain.isLockAir = true;
+					if (AutoTrain.lockAirY <= 0)
+					{
+						AutoTrain.lockAirY = me.cy;
+					}
+					me.statusMe = 4;
+					me.cvy = 0;
+					me.cvx = 0;
+					me.delayFall = 0;
+					if (me.skillPaint == null)
+					{
+						me.cf = 8;
+					}
+				}
+				else
+				{
+					AutoTrain.isLockAir = false;
 				}
 			}
 
@@ -330,28 +392,92 @@ namespace Mod.DungPham.KoiOctiiu957
 
 		private static void StickAndAttackMob(global::Char me, Mob boss)
 		{
+			int maxRangeX = 35;
+			int maxRangeY = 35;
+			if (me.myskill != null && me.myskill.template != null)
+			{
+				bool isMelee = (me.myskill.template.type == 1);
+				maxRangeX = isMelee ? 35 : ((me.myskill.dx > 0) ? me.myskill.dx : 60);
+				maxRangeY = isMelee ? 35 : ((me.myskill.dy > 0) ? me.myskill.dy : 60);
+			}
+
 			int distX = Res.abs(me.cx - boss.x);
 			int distY = Res.abs(me.cy - boss.y);
 
-			// Bám sát Mob Boss: Nếu cách xa hơn 30px thì dịch chuyển ngay tới cạnh Boss
-			if (distX > 30 || distY > 30)
+			// Bám sát Mob Boss: Nếu cách xa hơn maxRange thì dịch chuyển ngay tới cạnh Boss
+			if (distX > maxRangeX || distY > maxRangeY)
 			{
 				if (mSystem.currentTimeMillis() - lastTimeTeleportBoss > 150L)
 				{
 					lastTimeTeleportBoss = mSystem.currentTimeMillis();
-					if (distX > 200 || distY > 200)
+					
+					int targetX = boss.x;
+					int targetY = boss.y;
+
+					int groundY = AutoMap.GetYGround(targetX);
+					bool canHitFromGround = (groundY > 0 && Res.abs(groundY - boss.y) <= (maxRangeY - 10));
+
+					if (canHitFromGround)
 					{
-						AutoMap.TeleportTo(boss.x, boss.y);
+						targetY = groundY;
+						AutoTrain.isLockAir = false;
+						AutoTrain.lockAirY = 0;
 					}
 					else
 					{
-						me.cx = boss.x;
-						me.cy = boss.y;
+						targetY = boss.y;
+						AutoTrain.isLockAir = true;
+						AutoTrain.lockAirY = targetY;
+					}
+
+					if (distX > 200 || distY > 200)
+					{
+						AutoMap.TeleportTo(targetX, targetY);
+					}
+					else
+					{
+						me.cx = targetX;
+						me.cy = targetY;
 						me.statusMe = 3;
 						me.cxSend = -1;
 						me.cySend = -1;
 						Service.gI().charMove();
 					}
+					
+					if (AutoTrain.isLockAir)
+					{
+						me.statusMe = 4;
+						me.cf = 8;
+					}
+					else if (canHitFromGround)
+					{
+						me.statusMe = 1;
+					}
+				}
+			}
+			else
+			{
+				int groundYHere = AutoMap.GetYGround(me.cx);
+				bool canHitFromGroundHere = (groundYHere > 0 && Res.abs(groundYHere - boss.y) <= (maxRangeY - 10));
+				if (!canHitFromGroundHere)
+				{
+					AutoTrain.isLockAir = true;
+					if (AutoTrain.lockAirY <= 0)
+					{
+						AutoTrain.lockAirY = me.cy;
+					}
+					me.statusMe = 4;
+					me.cvy = 0;
+					me.cvx = 0;
+					me.delayFall = 0;
+					if (me.skillPaint == null)
+					{
+						me.cf = 8;
+					}
+				}
+				else
+				{
+					AutoTrain.isLockAir = false;
 				}
 			}
 

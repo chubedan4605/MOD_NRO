@@ -2510,7 +2510,7 @@ public class Char : IMapObject
 
 	private bool checkLockAir()
 	{
-		if (this.me && Mod.DungPham.KoiOctiiu957.AutoTrain.isAutoTrain && Mod.DungPham.KoiOctiiu957.AutoTrain.isLockAir)
+		if (this.me && (Mod.DungPham.KoiOctiiu957.AutoTrain.isAutoTrain || Mod.DungPham.KoiOctiiu957.AutoBoss.isAutoAttackBoss) && Mod.DungPham.KoiOctiiu957.AutoTrain.isLockAir)
 		{
 			this.statusMe = 4;
 			this.cvx = 0;

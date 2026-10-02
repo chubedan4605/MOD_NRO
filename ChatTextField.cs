@@ -277,7 +277,7 @@ public class ChatTextField : IActionListener
 		}
 		if (Main.isPC)
 		{
-			if (GameCanvas.keyPressed[15] || GameCanvas.keyPressed[25] || GameCanvas.keyPressed[5])
+			if (GameCanvas.keyPressed[15] || GameCanvas.keyPressed[25])
 			{
 				if (this.left != null)
 				{
@@ -285,7 +285,6 @@ public class ChatTextField : IActionListener
 				}
 				GameCanvas.keyPressed[15] = false;
 				GameCanvas.keyPressed[25] = false;
-				GameCanvas.keyPressed[5] = false;
 			}
 			if (GameCanvas.keyPressed[14] || GameCanvas.keyPressed[13] || GameCanvas.keyPressed[12])
 			{

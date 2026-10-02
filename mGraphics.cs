@@ -209,7 +209,7 @@ public class mGraphics
 		{
 			GUI.BeginGroup(new Rect((float)num5, (float)num6, (float)num7, (float)num8));
 		}
-		Graphics.DrawTexture(new Rect(pivotPoint.x - (float)num5, pivotPoint.y - (float)num4 - (float)num6, vector2.magnitude, 1f), texture2D);
+		GUI.DrawTexture(new Rect(pivotPoint.x - (float)num5, pivotPoint.y - (float)num4 - (float)num6, vector2.magnitude, 1f), texture2D);
 		if (this.isClip)
 		{
 			GUI.EndGroup();
@@ -681,7 +681,7 @@ public class mGraphics
 				num15 += num2;
 			}
 		}
-		Graphics.DrawTexture(new Rect(x + num3 + num14 + (float)num16, y + num4 + (float)num17 + num15, num * num7, num2 * (float)num9), image.texture, new Rect(((float)x0 + num3 + num8) / (float)image.texture.width, ((float)image.texture.height - num2 - ((float)y0 + num4)) / (float)image.texture.height, num / (float)image.texture.width, num2 / (float)image.texture.height), 0, 0, 0, 0);
+		GUI.DrawTextureWithTexCoords(new Rect(x + num3 + num14 + (float)num16, y + num4 + (float)num17 + num15, num * num7, num2 * (float)num9), image.texture, new Rect(((float)x0 + num3 + num8) / (float)image.texture.width, ((float)image.texture.height - num2 - ((float)y0 + num4)) / (float)image.texture.height, num / (float)image.texture.width, num2 / (float)image.texture.height));
 		if (transform == 5 || transform == 6 || transform == 4 || transform == 7)
 		{
 			GUI.matrix = this.matrixBackup;
@@ -831,7 +831,7 @@ public class mGraphics
 				num15 += num2;
 			}
 		}
-		Graphics.DrawTexture(new Rect((float)x + num3 + num14 + (float)num16, (float)y + num4 + (float)num17 + num15, num * num7, num2 * (float)num9), image.texture, new Rect((x0 + num3 + num8) / (float)image.texture.width, ((float)image.texture.height - num2 - (y0 + num4)) / (float)image.texture.height, num / (float)image.texture.width, num2 / (float)image.texture.height), 0, 0, 0, 0);
+		GUI.DrawTextureWithTexCoords(new Rect((float)x + num3 + num14 + (float)num16, (float)y + num4 + (float)num17 + num15, num * num7, num2 * (float)num9), image.texture, new Rect((x0 + num3 + num8) / (float)image.texture.width, ((float)image.texture.height - num2 - (y0 + num4)) / (float)image.texture.height, num / (float)image.texture.width, num2 / (float)image.texture.height));
 		if (transform == 5 || transform == 6 || transform == 4 || transform == 7)
 		{
 			GUI.matrix = this.matrixBackup;
@@ -1049,7 +1049,7 @@ public class mGraphics
 		h *= mGraphics.zoomLevel;
 		if (image != null)
 		{
-			Graphics.DrawTexture(new Rect((float)(x + this.translateX), (float)(y + this.translateY), (float)((tranform != 0) ? (-(float)w) : w), (float)h), image.texture);
+			GUI.DrawTexture(new Rect((float)(x + this.translateX), (float)(y + this.translateY), (float)((tranform != 0) ? (-(float)w) : w), (float)h), image.texture);
 		}
 	}
 
@@ -1060,7 +1060,7 @@ public class mGraphics
 		y *= mGraphics.zoomLevel;
 		if (image != null)
 		{
-			Graphics.DrawTexture(new Rect((float)x, (float)y, (float)image.w, (float)image.h), image.texture);
+			GUI.DrawTexture(new Rect((float)x, (float)y, (float)image.w, (float)image.h), image.texture);
 		}
 	}
 

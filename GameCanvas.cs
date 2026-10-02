@@ -379,7 +379,7 @@ public class GameCanvas : IActionListener
 			{
 				if (!Controller.isMain)
 				{
-					if (GameCanvas.currentScreen == GameCanvas.serverScreen && !Service.reciveFromMainSession)
+					if (GameCanvas.currentScreen == GameCanvas.serverScreen && !ServerListScreen.loadScreen && !Service.reciveFromMainSession)
 					{
 						GameCanvas.serverScreen.cancel();
 					}

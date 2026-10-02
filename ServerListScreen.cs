@@ -1582,8 +1582,8 @@ public class ServerListScreen : mScreen, IActionListener
 
 		long now = mSystem.currentTimeMillis();
 
-		// 1. ĐÃ VÀO GAME THÀNH CÔNG (chỉ khi đang ở màn hình GameScr, đã hết tải map và nạp Char hợp lệ)
-		if (GameCanvas.currentScreen is GameScr && !global::Char.isLoadingMap && global::Char.myCharz() != null && global::Char.myCharz().charID > 0)
+		// 1. ĐÃ VÀO GAME THÀNH CÔNG (chỉ khi đang ở màn hình GameScr)
+		if (GameCanvas.currentScreen is GameScr)
 		{
 			ServerListScreen.isAutoLoginActive = false;
 			ServerListScreen.isWaitingLoginResponse = false;
@@ -1655,7 +1655,7 @@ public class ServerListScreen : mScreen, IActionListener
 				// Hộp thoại đang chờ (Xin chờ, Đang tải...) -> Chờ phản hồi
 				if (allText.Contains("chờ") || allText.Contains("wait") || allText.Contains("đang tải"))
 				{
-					if (now - ServerListScreen.lastTimeAutoLogin > 12000L)
+					if (now - ServerListScreen.lastTimeAutoLogin > 60000L)
 					{
 						GameCanvas.endDlg();
 						global::Char.isLoadingMap = false;
@@ -1708,8 +1708,8 @@ public class ServerListScreen : mScreen, IActionListener
 				return;
 			}
 
-			// Nếu server im lặng quá 12 giây -> Timeout, dọn dẹp kết nối và chuẩn bị thử lại
-			if (now - ServerListScreen.lastTimeAutoLogin > 12000L)
+			// Nếu server im lặng quá 60 giây -> Timeout, dọn dẹp kết nối và chuẩn bị thử lại
+			if (now - ServerListScreen.lastTimeAutoLogin > 60000L)
 			{
 				Session_ME.gI().close();
 				GameCanvas.endDlg();
