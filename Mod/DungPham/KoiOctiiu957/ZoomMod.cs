@@ -15,16 +15,47 @@ namespace Mod.DungPham.KoiOctiiu957
         {
             int x = 60;
             int y = 41;
-            g.setColor(4465162);
-            g.fillRect(x, y, sliderW, sliderH);
             
             float p = (tempZoomRatio - 1.0f) / 1.5f; 
             if (p < 0) p = 0;
             if (p > 1) p = 1;
             int thumbX = x + (int)(p * sliderW);
             
-            g.setColor(16777215);
-            g.fillRect(thumbX - 5, y - 2, 10, sliderH + 4);
+            int trackX = x;
+            int trackY = y + (sliderH / 2) - 2;
+            int trackW = sliderW;
+            int trackH = 4;
+
+            // 1. Draw entire track dark blue
+            g.setColor(0x091D3E);
+            g.fillRect(trackX + 1, trackY, trackW - 2, trackH);
+            g.fillRect(trackX, trackY + 1, trackW, trackH - 2);
+
+            // 2. Draw filled track orange
+            int fillW = thumbX - trackX;
+            if (fillW > 0)
+            {
+                g.setColor(0xEF6A13);
+                g.fillRect(trackX + 1, trackY, fillW - 1, trackH);
+                g.fillRect(trackX, trackY + 1, fillW, trackH - 2);
+            }
+
+            // 3. Draw thumb
+            int cx = thumbX;
+            int cy = y + (sliderH / 2);
+
+            g.setColor(0xEF6A13);
+            g.fillRect(cx - 3, cy - 5, 7, 11);
+            g.fillRect(cx - 4, cy - 4, 9, 9);
+            g.fillRect(cx - 5, cy - 3, 11, 7);
+
+            // 4. Draw white chevron
+            g.setColor(0xFFFFFF);
+            g.fillRect(cx - 1, cy - 2, 2, 1);
+            g.fillRect(cx, cy - 1, 2, 1);
+            g.fillRect(cx + 1, cy, 2, 1);
+            g.fillRect(cx, cy + 1, 2, 1);
+            g.fillRect(cx - 1, cy + 2, 2, 1);
             
             mFont.tahoma_7_yellow.drawString(g, "Góc nhìn: " + (int)(tempZoomRatio * 100) + "%", x + sliderW + 10, y - 2, mFont.LEFT, mFont.tahoma_7b_dark);
         }
