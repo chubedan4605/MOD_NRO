@@ -90,7 +90,7 @@ namespace Mod.DungPham.KoiOctiiu957
 
 				if (targetIdx != -1 && targetIdx < GameScr.gI().numPlayer.Length && targetIdx < GameScr.gI().maxPlayer.Length && targetIdx < GameScr.gI().pts.Length)
 				{
-					bool isFree = (GameScr.gI().numPlayer[targetIdx] < GameScr.gI().maxPlayer[targetIdx]) && (GameScr.gI().pts[targetIdx] != 1);
+					bool isFree = (GameScr.gI().numPlayer[targetIdx] < GameScr.gI().maxPlayer[targetIdx]);
 					if (isFree)
 					{
 						if (now - lastTimeRequestChange > 500)

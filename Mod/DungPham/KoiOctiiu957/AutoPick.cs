@@ -62,7 +62,7 @@ namespace Mod.DungPham.KoiOctiiu957
 				string[] array = pickStr.Split(' ');
 				foreach (string s in array)
 				{
-					if (int.TryParse(s, out int item))
+					int item; if (int.TryParse(s, out item))
 					{
 						AutoPick.listItemAutoPick.Add(item);
 					}
@@ -76,7 +76,7 @@ namespace Mod.DungPham.KoiOctiiu957
 				string[] array2 = ignoreStr.Split(' ');
 				foreach (string s in array2)
 				{
-					if (int.TryParse(s, out int item))
+					int item; if (int.TryParse(s, out item))
 					{
 						AutoPick.listItemIgnorePick.Add(item);
 					}
@@ -560,3 +560,4 @@ namespace Mod.DungPham.KoiOctiiu957
 		};
 	}
 }
+

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -104,7 +104,7 @@ namespace Mod.DungPham.KoiOctiiu957
 				return;
 			case 2:
 				AutoMap.isEatChicken = !AutoMap.isEatChicken;
-				GameScr.info1.addInfo("Ăn Đùi Gà\n" + (AutoMap.isEatChicken ? "[STATUS: ON]" : "[STATUS: OFF]"), 0);
+				GameScr.info1.addInfo("Ä‚n ÄÃ¹i GÃ \n" + (AutoMap.isEatChicken ? "[STATUS: ON]" : "[STATUS: OFF]"), 0);
 				if (AutoMap.isSaveData)
 				{
 					Rms.saveRMSInt("AutoMapIsEatChicken", AutoMap.isEatChicken ? 1 : 0);
@@ -113,7 +113,7 @@ namespace Mod.DungPham.KoiOctiiu957
 				break;
 			case 3:
 				AutoMap.isHarvestPean = !AutoMap.isHarvestPean;
-				GameScr.info1.addInfo("Thu Đậu\n" + (AutoMap.isHarvestPean ? "[STATUS: ON]" : "[STATUS: OFF]"), 0);
+				GameScr.info1.addInfo("Thu Äáº­u\n" + (AutoMap.isHarvestPean ? "[STATUS: ON]" : "[STATUS: OFF]"), 0);
 				if (AutoMap.isSaveData)
 				{
 					Rms.saveRMSInt("AutoMapIsHarvestPean", AutoMap.isHarvestPean ? 1 : 0);
@@ -122,7 +122,7 @@ namespace Mod.DungPham.KoiOctiiu957
 				break;
 			case 4:
 				AutoMap.isUseCapsule = !AutoMap.isUseCapsule;
-				GameScr.info1.addInfo("Sử Dụng Capsule\n" + (AutoMap.isUseCapsule ? "[STATUS: ON]" : "[STATUS: OFF]"), 0);
+				GameScr.info1.addInfo("Sá»­ Dá»¥ng Capsule\n" + (AutoMap.isUseCapsule ? "[STATUS: ON]" : "[STATUS: OFF]"), 0);
 				if (AutoMap.isSaveData)
 				{
 					Rms.saveRMSInt("AutoMapIsUseCsb", AutoMap.isUseCapsule ? 1 : 0);
@@ -131,7 +131,7 @@ namespace Mod.DungPham.KoiOctiiu957
 				break;
 			case 5:
 				AutoMap.isSaveData = !AutoMap.isSaveData;
-				GameScr.info1.addInfo("Lưu Cài Đặt Auto Map\n" + (AutoMap.isSaveData ? "[STATUS: ON]" : "[STATUS: OFF]"), 0);
+				GameScr.info1.addInfo("LÆ°u CÃ i Äáº·t Auto Map\n" + (AutoMap.isSaveData ? "[STATUS: ON]" : "[STATUS: OFF]"), 0);
 				Rms.saveRMSInt("AutoMapIsSaveRms", AutoMap.isSaveData ? 1 : 0);
 				if (AutoMap.isSaveData)
 				{
@@ -151,7 +151,8 @@ namespace Mod.DungPham.KoiOctiiu957
 				AutoMap.ShowAdjacentMapsMenu();
 				return;
 			case 888:
-				if (p is AutoMap.AdjacentMapInfo info)
+				AutoMap.AdjacentMapInfo info = p as AutoMap.AdjacentMapInfo;
+				if (info != null)
 				{
 					info.GotoMap();
 				}
@@ -167,11 +168,11 @@ namespace Mod.DungPham.KoiOctiiu957
 			AutoMap.LoadData();
 			MyVector myVector = new MyVector();
 			myVector.addElement(new Command("Load Map", AutoMap.getInstance(), 1, null));
-			myVector.addElement(new Command("Map Liền Kề", AutoMap.getInstance(), 8, null));
-			myVector.addElement(new Command("Ăn Đùi Gà\n" + (AutoMap.isEatChicken ? "[STATUS: ON]" : "[STATUS: OFF]"), AutoMap.getInstance(), 2, null));
-			myVector.addElement(new Command("Thu Đậu\n" + (AutoMap.isHarvestPean ? "[STATUS: ON]" : "[STATUS: OFF]"), AutoMap.getInstance(), 3, null));
-			myVector.addElement(new Command("Sử Dụng Capsule\n" + (AutoMap.isUseCapsule ? "[STATUS: ON]" : "[STATUS: OFF]"), AutoMap.getInstance(), 4, null));
-			myVector.addElement(new Command("Lưu Cài Đặt\n" + (AutoMap.isSaveData ? "[STATUS: ON]" : "[STATUS: OFF]"), AutoMap.getInstance(), 5, null));
+			myVector.addElement(new Command("Map Liá»n Ká»", AutoMap.getInstance(), 8, null));
+			myVector.addElement(new Command("Ä‚n ÄÃ¹i GÃ \n" + (AutoMap.isEatChicken ? "[STATUS: ON]" : "[STATUS: OFF]"), AutoMap.getInstance(), 2, null));
+			myVector.addElement(new Command("Thu Äáº­u\n" + (AutoMap.isHarvestPean ? "[STATUS: ON]" : "[STATUS: OFF]"), AutoMap.getInstance(), 3, null));
+			myVector.addElement(new Command("Sá»­ Dá»¥ng Capsule\n" + (AutoMap.isUseCapsule ? "[STATUS: ON]" : "[STATUS: OFF]"), AutoMap.getInstance(), 4, null));
+			myVector.addElement(new Command("LÆ°u CÃ i Äáº·t\n" + (AutoMap.isSaveData ? "[STATUS: ON]" : "[STATUS: OFF]"), AutoMap.getInstance(), 5, null));
 			GameCanvas.menu.startAt(myVector, 3);
 		}
 
@@ -254,14 +255,14 @@ namespace Mod.DungPham.KoiOctiiu957
 				if (list2.Count > 0)
 				{
 					list2.Sort((Waypoint w1, Waypoint w2) => ((int)(w1.minX + w1.maxX)).CompareTo((int)(w2.minX + w2.maxX)));
-					list.Add(AutoMap.CreateAdjacentMapInfo("Trái (J)", 0, list2[0]));
+					list.Add(AutoMap.CreateAdjacentMapInfo("TrÃ¡i (J)", 0, list2[0]));
 					if (list2.Count >= 2)
 					{
-						list.Add(AutoMap.CreateAdjacentMapInfo("Phải (L)", 1, list2[list2.Count - 1]));
+						list.Add(AutoMap.CreateAdjacentMapInfo("Pháº£i (L)", 1, list2[list2.Count - 1]));
 					}
 					if (list2.Count >= 3)
 					{
-						list.Add(AutoMap.CreateAdjacentMapInfo("Giữa (K)", 2, list2[list2.Count / 2]));
+						list.Add(AutoMap.CreateAdjacentMapInfo("Giá»¯a (K)", 2, list2[list2.Count / 2]));
 					}
 				}
 			}
@@ -335,7 +336,7 @@ namespace Mod.DungPham.KoiOctiiu957
 			List<AutoMap.AdjacentMapInfo> adjacentMaps = AutoMap.GetAdjacentMaps();
 			if (adjacentMaps.Count == 0)
 			{
-				GameScr.info1.addInfo("Không có map liền kề nào!", 0);
+				GameScr.info1.addInfo("KhÃ´ng cÃ³ map liá»n ká» nÃ o!", 0);
 				return;
 			}
 			MyVector myVector = new MyVector();
@@ -423,7 +424,7 @@ namespace Mod.DungPham.KoiOctiiu957
 			int[] array = AutoMap.FindWay(mapID);
 			if (array == null)
 			{
-				GameScr.info1.addInfo("Không thể tìm thấy đường đi", 0);
+				GameScr.info1.addInfo("KhÃ´ng thá»ƒ tÃ¬m tháº¥y Ä‘Æ°á»ng Ä‘i", 0);
 				return;
 			}
 			if (AutoMap.isUseCapsule)
@@ -793,11 +794,11 @@ namespace Mod.DungPham.KoiOctiiu957
 		// Token: 0x06000AFA RID: 2810 RVA: 0x000A2EA0 File Offset: 0x000A10A0
 		private static void AddPlanetXmap()
 		{
-			AutoMap.planetDictionary.Add("Trái đất", AutoMap.idMapsTraiDat);
-			AutoMap.planetDictionary.Add("Namếc", AutoMap.idMapsNamek);
+			AutoMap.planetDictionary.Add("TrÃ¡i Ä‘áº¥t", AutoMap.idMapsTraiDat);
+			AutoMap.planetDictionary.Add("Namáº¿c", AutoMap.idMapsNamek);
 			AutoMap.planetDictionary.Add("Xayda", AutoMap.idMapsXayda);
 			AutoMap.planetDictionary.Add("Fide", AutoMap.idMapsNappa);
-			AutoMap.planetDictionary.Add("Tương lai", AutoMap.idMapsTuongLai);
+			AutoMap.planetDictionary.Add("TÆ°Æ¡ng lai", AutoMap.idMapsTuongLai);
 			AutoMap.planetDictionary.Add("Cold", AutoMap.idMapsCold);
 		}
 
@@ -842,7 +843,7 @@ namespace Mod.DungPham.KoiOctiiu957
 					return;
 				}
 			}
-			GameScr.info1.addInfo("Không thể thực hiện", 0);
+			GameScr.info1.addInfo("KhÃ´ng thá»ƒ thá»±c hiá»‡n", 0);
 		}
 
 		// Token: 0x06000AFE RID: 2814 RVA: 0x000091BE File Offset: 0x000073BE
@@ -938,7 +939,7 @@ namespace Mod.DungPham.KoiOctiiu957
 			{
 				result = string.Concat(new object[]
 				{
-					"Siêu hạng\n[",
+					"SiÃªu háº¡ng\n[",
 					mapID,
 					"]"
 				});
@@ -1046,7 +1047,7 @@ namespace Mod.DungPham.KoiOctiiu957
 			int distX = Res.abs(diffX);
 			int distY = Res.abs(diffY);
 
-			// Nếu khoảng cách rất ngắn (< 100px), dịch chuyển trực tiếp
+			// Náº¿u khoáº£ng cÃ¡ch ráº¥t ngáº¯n (< 100px), dá»‹ch chuyá»ƒn trá»±c tiáº¿p
 			if (distX < 100 && distY < 100)
 			{
 				me.cx = targetX;
@@ -1058,7 +1059,7 @@ namespace Mod.DungPham.KoiOctiiu957
 				return;
 			}
 
-			// Tính tầm bay cao an toàn (flyY) vượt mọi vật cản/ngọn đồi ở giữa map
+			// TÃ­nh táº§m bay cao an toÃ n (flyY) vÆ°á»£t má»i váº­t cáº£n/ngá»n Ä‘á»“i á»Ÿ giá»¯a map
 			int minPointY = (startY < targetY) ? startY : targetY;
 			int flyY = minPointY - 100;
 			if (flyY < 60)
@@ -1070,7 +1071,7 @@ namespace Mod.DungPham.KoiOctiiu957
 				flyY = minPointY;
 			}
 
-			// Giai đoạn 1: Bay Y lên tầm cao an toàn flyY tại vị trí X khởi đầu
+			// Giai Ä‘oáº¡n 1: Bay Y lÃªn táº§m cao an toÃ n flyY táº¡i vá»‹ trÃ­ X khá»Ÿi Ä‘áº§u
 			if (startY > flyY)
 			{
 				int diffY1 = flyY - startY;
@@ -1088,7 +1089,7 @@ namespace Mod.DungPham.KoiOctiiu957
 				}
 			}
 
-			// Giai đoạn 2: Băng ngang X qua không trung trên tầm cao flyY (vượt mọi đồi núi/vật cản)
+			// Giai Ä‘oáº¡n 2: BÄƒng ngang X qua khÃ´ng trung trÃªn táº§m cao flyY (vÆ°á»£t má»i Ä‘á»“i nÃºi/váº­t cáº£n)
 			if (distX > 0)
 			{
 				int stepsX = (distX + stepSize - 1) / stepSize;
@@ -1105,7 +1106,7 @@ namespace Mod.DungPham.KoiOctiiu957
 				}
 			}
 
-			// Giai đoạn 3: Hạ Y từ flyY xuống targetY tại vị trí targetX
+			// Giai Ä‘oáº¡n 3: Háº¡ Y tá»« flyY xuá»‘ng targetY táº¡i vá»‹ trÃ­ targetX
 			if (targetY != flyY)
 			{
 				int diffY2 = targetY - flyY;
@@ -1123,7 +1124,7 @@ namespace Mod.DungPham.KoiOctiiu957
 				}
 			}
 
-			// Chốt tọa độ đích cuối cùng
+			// Chá»‘t tá»a Ä‘á»™ Ä‘Ã­ch cuá»‘i cÃ¹ng
 			me.cx = targetX;
 			me.cy = targetY;
 			me.statusMe = (TileMap.tileTypeAt(targetX / 24, targetY / 24) == 0) ? 3 : 1;
@@ -1177,11 +1178,11 @@ namespace Mod.DungPham.KoiOctiiu957
 			global::Char me = global::Char.myCharz();
 			if (me.meDead || me.statusMe == 14 || me.statusMe == 5 || me.cHP <= 0L)
 			{
-				GameScr.info1.addInfo("Bạn đang kiệt sức!", 0);
+				GameScr.info1.addInfo("Báº¡n Ä‘ang kiá»‡t sá»©c!", 0);
 				return;
 			}
 
-			// Đảm bảo không bị chặn charMove và các kiểm tra map
+			// Äáº£m báº£o khÃ´ng bá»‹ cháº·n charMove vÃ  cÃ¡c kiá»ƒm tra map
 			global::Char.ischangingMap = false;
 			global::Char.isLoadingMap = false;
 			global::Char.isLockKey = false;
@@ -1190,7 +1191,7 @@ namespace Mod.DungPham.KoiOctiiu957
 			int wpCount = TileMap.vGo.size();
 			if (wpCount == 0)
 			{
-				GameScr.info1.addInfo("Map này không có điểm chuyển map!", 0);
+				GameScr.info1.addInfo("Map nÃ y khÃ´ng cÃ³ Ä‘iá»ƒm chuyá»ƒn map!", 0);
 				return;
 			}
 
@@ -1206,23 +1207,23 @@ namespace Mod.DungPham.KoiOctiiu957
 
 			if (listWp.Count == 0)
 			{
-				GameScr.info1.addInfo("Map này không có điểm chuyển map!", 0);
+				GameScr.info1.addInfo("Map nÃ y khÃ´ng cÃ³ Ä‘iá»ƒm chuyá»ƒn map!", 0);
 				return;
 			}
 
-			// Sắp xếp các Waypoint theo tọa độ X trung tâm từ trái qua phải
+			// Sáº¯p xáº¿p cÃ¡c Waypoint theo tá»a Ä‘á»™ X trung tÃ¢m tá»« trÃ¡i qua pháº£i
 			listWp.Sort((w1, w2) => ((int)(w1.minX + w1.maxX)).CompareTo((int)(w2.minX + w2.maxX)));
 
 			Waypoint targetWp = null;
-			if (position == 0) // Trái (J)
+			if (position == 0) // TrÃ¡i (J)
 			{
 				targetWp = listWp[0];
 			}
-			else if (position == 1) // Phải (L)
+			else if (position == 1) // Pháº£i (L)
 			{
 				targetWp = listWp[listWp.Count - 1];
 			}
-			else if (position == 2) // Giữa (K)
+			else if (position == 2) // Giá»¯a (K)
 			{
 				if (listWp.Count <= 2)
 				{
@@ -1251,10 +1252,10 @@ namespace Mod.DungPham.KoiOctiiu957
 				targetWp = listWp[0];
 			}
 
-			// Tính toán tọa độ X an toàn: chính giữa Waypoint
+			// TÃ­nh toÃ¡n tá»a Ä‘á»™ X an toÃ n: chÃ­nh giá»¯a Waypoint
 			int targetX = (int)(targetWp.minX + targetWp.maxX) / 2;
 
-			// Giữ targetX trong giới hạn an toàn của bản đồ (tránh va chạm mép map < 15px hoặc > pxw - 15px)
+			// Giá»¯ targetX trong giá»›i háº¡n an toÃ n cá»§a báº£n Ä‘á»“ (trÃ¡nh va cháº¡m mÃ©p map < 15px hoáº·c > pxw - 15px)
 			if (targetX < 15)
 			{
 				targetX = 15;
@@ -1264,7 +1265,7 @@ namespace Mod.DungPham.KoiOctiiu957
 				targetX = TileMap.pxw - 15;
 			}
 
-			// Đảm bảo targetX luôn nằm trọn trong Waypoint
+			// Äáº£m báº£o targetX luÃ´n náº±m trá»n trong Waypoint
 			if (targetX < (int)targetWp.minX)
 			{
 				targetX = (int)targetWp.minX + 2;
@@ -1274,10 +1275,10 @@ namespace Mod.DungPham.KoiOctiiu957
 				targetX = (int)targetWp.maxX - 2;
 			}
 
-			// Tọa độ Y chuẩn xác: Giữ nguyên Y nếu đã nằm trong Waypoint, hoặc lấy tâm Y để tránh vượt khung khi gồ ghề
+			// Tá»a Ä‘á»™ Y chuáº©n xÃ¡c: Giá»¯ nguyÃªn Y náº¿u Ä‘Ã£ náº±m trong Waypoint, hoáº·c láº¥y tÃ¢m Y Ä‘á»ƒ trÃ¡nh vÆ°á»£t khung khi gá»“ ghá»
 			int targetY = AutoMap.GetBestWaypointY(targetWp, me.cy);
 
-			// Kích hoạt PopUp của Waypoint để isInEnterOnlinePoint() / isInEnterOfflinePoint() trả về hợp lệ
+			// KÃ­ch hoáº¡t PopUp cá»§a Waypoint Ä‘á»ƒ isInEnterOnlinePoint() / isInEnterOfflinePoint() tráº£ vá» há»£p lá»‡
 			if (targetWp.popup != null)
 			{
 				targetWp.popup.isPaint = true;
@@ -1291,13 +1292,13 @@ namespace Mod.DungPham.KoiOctiiu957
 				}
 			}
 
-			string posName = (position == 0) ? "Trái (J)" : ((position == 1) ? "Phải (L)" : "Giữa (K)");
+			string posName = (position == 0) ? "TrÃ¡i (J)" : ((position == 1) ? "Pháº£i (L)" : "Giá»¯a (K)");
 			string cmdName = (targetWp.isOffline || TileMap.isTrainingMap()) ? "getMapOffline (cmd -33)" : "requestChangeMap (cmd -23)";
-			Debug.Log(string.Format("[AutoMap] Bấm {0} | MapID={1} | Waypoint: X[{2}..{3}] Y[{4}..{5}] | From: ({6}, {7}) -> Target: ({8}, {9}) | Gói tin: {10}",
+			Debug.Log(string.Format("[AutoMap] Báº¥m {0} | MapID={1} | Waypoint: X[{2}..{3}] Y[{4}..{5}] | From: ({6}, {7}) -> Target: ({8}, {9}) | GÃ³i tin: {10}",
 				posName, TileMap.mapID, targetWp.minX, targetWp.maxX, targetWp.minY, targetWp.maxY, me.cx, me.cy, targetX, targetY, cmdName));
 			GameScr.info1.addInfo(string.Format("Qua map [{0}] -> ({1}, {2})", posName, targetX, targetY), 0);
 
-			// Dọn dẹp hành động và tiêu điểm để không bị ngắt
+			// Dá»n dáº¹p hÃ nh Ä‘á»™ng vÃ  tiÃªu Ä‘iá»ƒm Ä‘á»ƒ khÃ´ng bá»‹ ngáº¯t
 			GameScr.gI().auto = 0;
 			me.currentMovePoint = null;
 			me.charFocus = null;
@@ -1305,10 +1306,10 @@ namespace Mod.DungPham.KoiOctiiu957
 			me.npcFocus = null;
 			me.itemFocus = null;
 
-			// Dịch chuyển từng bước an toàn và gửi vị trí mới lên Server
+			// Dá»‹ch chuyá»ƒn tá»«ng bÆ°á»›c an toÃ n vÃ  gá»­i vá»‹ trÃ­ má»›i lÃªn Server
 			AutoMap.TeleportTo(targetX, targetY);
 
-			// Gửi gói tin chuyển map tương ứng (Offline hoặc Online)
+			// Gá»­i gÃ³i tin chuyá»ƒn map tÆ°Æ¡ng á»©ng (Offline hoáº·c Online)
 			AutoMap.MarkActionSent();
 			if (targetWp.isOffline || TileMap.isTrainingMap())
 			{
@@ -1616,7 +1617,7 @@ namespace Mod.DungPham.KoiOctiiu957
 				}
 				if (num == -1 || maxY == -1)
 				{
-					GameScr.info1.addInfo("Có lỗi xảy ra", 0);
+					GameScr.info1.addInfo("CÃ³ lá»—i xáº£y ra", 0);
 					return;
 				}
 				this.TeleportTo(num, maxY);
@@ -1659,3 +1660,4 @@ namespace Mod.DungPham.KoiOctiiu957
 		}
 	}
 }
+

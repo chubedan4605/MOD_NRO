@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Net.Sockets;
 using System.Threading;
 using UnityEngine;
@@ -27,7 +27,7 @@ public class ServerListScreen : mScreen, IActionListener
 		GameScr.cmy = 200;
 		if (this.cmdCallHotline == null)
 		{
-			this.cmdCallHotline = new Command("Gọi hotline", this, 13, null);
+			this.cmdCallHotline = new Command("Gá»i hotline", this, 13, null);
 			this.cmdCallHotline.x = GameCanvas.w - 75;
 			if (mSystem.clientType == 1 && !GameCanvas.isTouch)
 			{
@@ -138,13 +138,13 @@ public class ServerListScreen : mScreen, IActionListener
 				}
 				else
 				{
-					this.cmd[0] = new Command(ServerListScreen.isAutoLoginActive ? "Dừng Auto Login" : "Auto Login", this, 20001, null);
+					this.cmd[0] = new Command(ServerListScreen.isAutoLoginActive ? "Dá»«ng Auto Login" : "Auto Login", this, 20001, null);
 				}
 				break;
 			case 1:
 				if (this.nCmdPlay == 1)
 				{
-					this.cmd[1] = new Command(ServerListScreen.isAutoLoginActive ? "Dừng Auto Login" : "Auto Login", this, 20001, null);
+					this.cmd[1] = new Command(ServerListScreen.isAutoLoginActive ? "Dá»«ng Auto Login" : "Auto Login", this, 20001, null);
 				}
 				else
 				{
@@ -362,7 +362,7 @@ public class ServerListScreen : mScreen, IActionListener
 		}
 		if (ServerListScreen.isAutoLoginActive)
 		{
-			mFont.tahoma_7b_yellow.drawString(g, "Đang Auto Login (lần " + ServerListScreen.autoLoginRetryCount + ")...", GameCanvas.hw, 5, mFont.CENTER);
+			mFont.tahoma_7b_yellow.drawString(g, "Äang Auto Login (láº§n " + ServerListScreen.autoLoginRetryCount + ")...", GameCanvas.hw, 5, mFont.CENTER);
 		}
 		base.paint(g);
 	}
@@ -826,7 +826,7 @@ public class ServerListScreen : mScreen, IActionListener
 				ServerListScreen.hasSentSelectChar = false;
 				ServerListScreen.lastTimeSelectChar = 0L;
 				ServerListScreen.isWaitingLoginResponse = true;
-				GameScr.info1.addInfo("BẬT Auto Login - Đang kết nối...", 0);
+				GameScr.info1.addInfo("Báº¬T Auto Login - Äang káº¿t ná»‘i...", 0);
 				this.Login_New();
 			}
 			else
@@ -836,7 +836,7 @@ public class ServerListScreen : mScreen, IActionListener
 				global::Char.isLoadingMap = false;
 				ServerListScreen.hasSentSelectChar = false;
 				ServerListScreen.isWaitingLoginResponse = false;
-				GameScr.info1.addInfo("ĐÃ TẮT Auto Login", 0);
+				GameScr.info1.addInfo("ÄÃƒ Táº®T Auto Login", 0);
 				if (GameCanvas.currentScreen != this)
 				{
 					this.switchToMe();
@@ -1417,10 +1417,10 @@ public class ServerListScreen : mScreen, IActionListener
 	private int lY;
 
 	// Token: 0x0400129E RID: 4766
-	public static string smartPhoneVN = "Vũ trụ 1:dragon1.teamobi.com:14445:0:0:0,Vũ trụ 2:dragon2.teamobi.com:14445:0:0:0,Vũ trụ 3:dragon3.teamobi.com:14445:0:0:0,Vũ trụ 4:dragon4.teamobi.com:14445:0:0:0,Vũ trụ 5:dragon5.teamobi.com:14445:0:0:0,Vũ trụ 6:dragon6.teamobi.com:14445:0:0:0,Vũ trụ 7:dragon7.teamobi.com:14445:0:0:0,Vũ trụ 8:dragon10.teamobi.com:14446:0:0:0,Vũ trụ 9:dragon10.teamobi.com:14447:0:0:0,Vũ trụ 10:dragon10.teamobi.com:14445:0:0:0,Vũ trụ 11:dragon11.teamobi.com:14445:0:0:0,Vũ trụ 15:dragon15.teamobi.com:14445:0:0:0,Võ đài liên vũ trụ:dragonwar.teamobi.com:20000:0:0:0,Universe 1:dragon.indonaga.com:14445:1:0:0,Naga:dragon.indonaga.com:14446:2:0:0,0,0";
+	public static string smartPhoneVN = "VÅ© trá»¥ 1:dragon1.teamobi.com:14445:0:0:0,VÅ© trá»¥ 2:dragon2.teamobi.com:14445:0:0:0,VÅ© trá»¥ 3:dragon3.teamobi.com:14445:0:0:0,VÅ© trá»¥ 4:dragon4.teamobi.com:14445:0:0:0,VÅ© trá»¥ 5:dragon5.teamobi.com:14445:0:0:0,VÅ© trá»¥ 6:dragon6.teamobi.com:14445:0:0:0,VÅ© trá»¥ 7:dragon7.teamobi.com:14445:0:0:0,VÅ© trá»¥ 8:dragon10.teamobi.com:14446:0:0:0,VÅ© trá»¥ 9:dragon10.teamobi.com:14447:0:0:0,VÅ© trá»¥ 10:dragon10.teamobi.com:14445:0:0:0,VÅ© trá»¥ 11:dragon11.teamobi.com:14445:0:0:0,VÅ© trá»¥ 15:dragon15.teamobi.com:14445:0:0:0,VÃµ Ä‘Ã i liÃªn vÅ© trá»¥:dragonwar.teamobi.com:20000:0:0:0,Universe 1:dragon.indonaga.com:14445:1:0:0,Naga:dragon.indonaga.com:14446:2:0:0,0,0";
 
 	// Token: 0x0400129F RID: 4767
-	public static string javaVN = "Vũ trụ 1:112.213.94.23:14445:0:0:0,Vũ trụ 2:210.211.109.199:14445:0:0:0,Vũ trụ 3:112.213.85.88:14445:0:0:0,Vũ trụ 4:27.0.12.164:14445:0:0:0,Vũ trụ 5:27.0.12.16:14445:0:0:0,Vũ trụ 6:27.0.12.173:14445:0:0:0,Vũ trụ 7:112.213.94.223:14445:0:0:0,Vũ trụ 8:27.0.14.66:14446:0:0:0,Vũ trụ 9:27.0.14.66:14447:0:0:0,Vũ trụ 10:27.0.14.66:14445:0:0:0,Vũ trụ 11:112.213.85.35:14445:0:0:0,Vũ trụ 15:210.211.109.199:14445:0:0:0,Võ đài liên vũ trụ:27.0.12.173:20000:0:0:0,Universe 1:52.74.230.22:14445:1:0:0,Naga:52.74.230.22:14446:2:0:0,0,0";
+	public static string javaVN = "VÅ© trá»¥ 1:112.213.94.23:14445:0:0:0,VÅ© trá»¥ 2:210.211.109.199:14445:0:0:0,VÅ© trá»¥ 3:112.213.85.88:14445:0:0:0,VÅ© trá»¥ 4:27.0.12.164:14445:0:0:0,VÅ© trá»¥ 5:27.0.12.16:14445:0:0:0,VÅ© trá»¥ 6:27.0.12.173:14445:0:0:0,VÅ© trá»¥ 7:112.213.94.223:14445:0:0:0,VÅ© trá»¥ 8:27.0.14.66:14446:0:0:0,VÅ© trá»¥ 9:27.0.14.66:14447:0:0:0,VÅ© trá»¥ 10:27.0.14.66:14445:0:0:0,VÅ© trá»¥ 11:112.213.85.35:14445:0:0:0,VÅ© trá»¥ 15:210.211.109.199:14445:0:0:0,VÃµ Ä‘Ã i liÃªn vÅ© trá»¥:27.0.12.173:20000:0:0:0,Universe 1:52.74.230.22:14445:1:0:0,Naga:52.74.230.22:14446:2:0:0,0,0";
 
 	// Token: 0x040012A0 RID: 4768
 	public static string smartPhoneIn = "Naga:dragon.indonaga.com:14446:2:0:0,2,0";
@@ -1582,14 +1582,14 @@ public class ServerListScreen : mScreen, IActionListener
 
 		long now = mSystem.currentTimeMillis();
 
-		// 1. ĐÃ VÀO GAME THÀNH CÔNG (chỉ khi đang ở màn hình GameScr)
+		// 1. ÄÃƒ VÃ€O GAME THÃ€NH CÃ”NG (chá»‰ khi Ä‘ang á»Ÿ mÃ n hÃ¬nh GameScr)
 		if (GameCanvas.currentScreen is GameScr)
 		{
 			ServerListScreen.isAutoLoginActive = false;
 			ServerListScreen.isWaitingLoginResponse = false;
 			ServerListScreen.hasSentSelectChar = false;
 			ServerListScreen.autoLoginRetryCount = 0;
-			GameScr.info1.addInfo("Auto Login thành công!", 0);
+			GameScr.info1.addInfo("Auto Login thÃ nh cÃ´ng!", 0);
 			if (GameCanvas.serverScreen != null)
 			{
 				GameCanvas.serverScreen.initCommand();
@@ -1597,8 +1597,9 @@ public class ServerListScreen : mScreen, IActionListener
 			return;
 		}
 
-		// 2. MÀN HÌNH CHỌN NHÂN VẬT (ChooseCharScr - nếu server có giao diện chọn nhân vật)
-		if (GameCanvas.currentScreen is ChooseCharScr chooseScr)
+		// 2. MÃ€N HÃŒNH CHá»ŒN NHÃ‚N Váº¬T (ChooseCharScr - náº¿u server cÃ³ giao diá»‡n chá»n nhÃ¢n váº­t)
+		ChooseCharScr chooseScr = GameCanvas.currentScreen as ChooseCharScr;
+		if (chooseScr != null)
 		{
 			if (ChooseCharScr.playerData != null && ChooseCharScr.playerData.Length > 0)
 			{
@@ -1615,10 +1616,11 @@ public class ServerListScreen : mScreen, IActionListener
 			return;
 		}
 
-		// 3. XỬ LÝ HỘP THOẠI (Dialog)
+		// 3. Xá»¬ LÃ Há»˜P THOáº I (Dialog)
 		if (GameCanvas.currentDialog != null)
 		{
-			if (GameCanvas.currentDialog is MsgDlg msgDlg)
+			MsgDlg msgDlg = GameCanvas.currentDialog as MsgDlg;
+			if (msgDlg != null)
 			{
 				string allText = string.Empty;
 				if (msgDlg.info != null)
@@ -1633,14 +1635,14 @@ public class ServerListScreen : mScreen, IActionListener
 				}
 				allText = allText.ToLower();
 
-				// Các lỗi sai thông tin / khóa nick / vi phạm -> DỪNG NGAY Auto Login để tránh bị khóa IP/tài khoản
-				if (allText.Contains("không chính xác") || 
-				    allText.Contains("không đúng") || 
-				    allText.Contains("sai thông tin") || 
-				    allText.Contains("nhiều lần") || 
-				    allText.Contains("bị khóa") || 
+				// CÃ¡c lá»—i sai thÃ´ng tin / khÃ³a nick / vi pháº¡m -> Dá»ªNG NGAY Auto Login Ä‘á»ƒ trÃ¡nh bá»‹ khÃ³a IP/tÃ i khoáº£n
+				if (allText.Contains("khÃ´ng chÃ­nh xÃ¡c") || 
+				    allText.Contains("khÃ´ng Ä‘Ãºng") || 
+				    allText.Contains("sai thÃ´ng tin") || 
+				    allText.Contains("nhiá»u láº§n") || 
+				    allText.Contains("bá»‹ khÃ³a") || 
 				    allText.Contains("banned") || 
-				    allText.Contains("chưa kích hoạt"))
+				    allText.Contains("chÆ°a kÃ­ch hoáº¡t"))
 				{
 					ServerListScreen.isAutoLoginActive = false;
 					ServerListScreen.isWaitingLoginResponse = false;
@@ -1652,8 +1654,8 @@ public class ServerListScreen : mScreen, IActionListener
 					return;
 				}
 
-				// Hộp thoại đang chờ (Xin chờ, Đang tải...) -> Chờ phản hồi
-				if (allText.Contains("chờ") || allText.Contains("wait") || allText.Contains("đang tải"))
+				// Há»™p thoáº¡i Ä‘ang chá» (Xin chá», Äang táº£i...) -> Chá» pháº£n há»“i
+				if (allText.Contains("chá»") || allText.Contains("wait") || allText.Contains("Ä‘ang táº£i"))
 				{
 					if (now - ServerListScreen.lastTimeAutoLogin > 60000L)
 					{
@@ -1669,8 +1671,8 @@ public class ServerListScreen : mScreen, IActionListener
 					return;
 				}
 
-				// Các hộp thoại báo lỗi mất kết nối / quá tải server -> Đóng sau 1.5s và quay lại server list để retry
-				if (allText.Contains("quá tải") || allText.Contains("mất sóng") || allText.Contains("mất kết nối") || allText.Contains("không thể kết nối") || allText.Contains("bảo trì") || allText.Contains("thử lại"))
+				// CÃ¡c há»™p thoáº¡i bÃ¡o lá»—i máº¥t káº¿t ná»‘i / quÃ¡ táº£i server -> ÄÃ³ng sau 1.5s vÃ  quay láº¡i server list Ä‘á»ƒ retry
+				if (allText.Contains("quÃ¡ táº£i") || allText.Contains("máº¥t sÃ³ng") || allText.Contains("máº¥t káº¿t ná»‘i") || allText.Contains("khÃ´ng thá»ƒ káº¿t ná»‘i") || allText.Contains("báº£o trÃ¬") || allText.Contains("thá»­ láº¡i"))
 				{
 					if (now - ServerListScreen.lastTimeAutoLogin > 1500L)
 					{
@@ -1688,10 +1690,10 @@ public class ServerListScreen : mScreen, IActionListener
 			}
 		}
 
-		// 4. KIỂM TRA TRẠNG THÁI ĐANG CHỜ PHẢN HỒI TỪ SERVER
+		// 4. KIá»‚M TRA TRáº NG THÃI ÄANG CHá»œ PHáº¢N Há»’I Tá»ª SERVER
 		if (ServerListScreen.isWaitingLoginResponse)
 		{
-			// Nếu mất kết nối socket
+			// Náº¿u máº¥t káº¿t ná»‘i socket
 			if (!Session_ME.gI().isConnected() && !Session_ME.connecting)
 			{
 				if (now - ServerListScreen.lastTimeAutoLogin > 1500L)
@@ -1708,7 +1710,7 @@ public class ServerListScreen : mScreen, IActionListener
 				return;
 			}
 
-			// Nếu server im lặng quá 60 giây -> Timeout, dọn dẹp kết nối và chuẩn bị thử lại
+			// Náº¿u server im láº·ng quÃ¡ 60 giÃ¢y -> Timeout, dá»n dáº¹p káº¿t ná»‘i vÃ  chuáº©n bá»‹ thá»­ láº¡i
 			if (now - ServerListScreen.lastTimeAutoLogin > 60000L)
 			{
 				Session_ME.gI().close();
@@ -1723,11 +1725,11 @@ public class ServerListScreen : mScreen, IActionListener
 				return;
 			}
 
-			// Đang chờ phản hồi hợp lệ từ server, TUYỆT ĐỐI KHÔNG gửi đè request!
+			// Äang chá» pháº£n há»“i há»£p lá»‡ tá»« server, TUYá»†T Äá»I KHÃ”NG gá»­i Ä‘Ã¨ request!
 			return;
 		}
 
-		// 5. GỬI REQUEST ĐĂNG NHẬP RETRY (Chỉ gửi khi KHÔNG đang chờ và đã qua ít nhất 2.5 giây)
+		// 5. Gá»¬I REQUEST ÄÄ‚NG NHáº¬P RETRY (Chá»‰ gá»­i khi KHÃ”NG Ä‘ang chá» vÃ  Ä‘Ã£ qua Ã­t nháº¥t 2.5 giÃ¢y)
 		if (now - ServerListScreen.lastTimeAutoLogin > 2500L)
 		{
 			ServerListScreen.lastTimeAutoLogin = now;
@@ -1746,3 +1748,4 @@ public class ServerListScreen : mScreen, IActionListener
 		}
 	}
 }
+

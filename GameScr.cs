@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 using Assets.src.g;
 using Mod.DungPham.KoiOctiiu957;
@@ -39,7 +39,7 @@ public class GameScr : mScreen, IChatable
 		{
 			GameScr.isHaveSelectSkill = true;
 		}
-		this.cmdDoiCo = new Command("Đổi cờ", GameCanvas.gI(), 100001, null);
+		this.cmdDoiCo = new Command("Äá»•i cá»", GameCanvas.gI(), 100001, null);
 		this.cmdLogOut = new Command("Logout", GameCanvas.gI(), 100002, null);
 		this.cmdChatTheGioi = new Command("chat world", GameCanvas.gI(), 100003, null);
 		this.cmdshowInfo = new Command("InfoLog", GameCanvas.gI(), 100004, null);
@@ -7302,7 +7302,7 @@ public class GameScr : mScreen, IChatable
 		GameScr.fra_PVE_Bar_1.drawFrame(0, x - frameWidth / 2 + 1, y, 0, 0, g);
 		string st = NinjaUtil.getTime((int)((GameScr.nCT_timeBallte - mSystem.currentTimeMillis()) / 1000L)) + string.Empty;
 		mFont.tahoma_7b_yellow.drawString(g, st, num5 + w / 2 - 2, y + 5, 2);
-		mFont.tahoma_7_grey.drawString(g, "Tầng " + GameScr.nCT_floor, num5 + w / 2 - 3, y + GameScr.fra_PVE_Bar_1.frameHeight, mFont.CENTER);
+		mFont.tahoma_7_grey.drawString(g, "Táº§ng " + GameScr.nCT_floor, num5 + w / 2 - 3, y + GameScr.fra_PVE_Bar_1.frameHeight, mFont.CENTER);
 		int width = mFont.tahoma_7b_red.getWidth(GameScr.nCT_TeamA + string.Empty);
 		mFont.tahoma_7b_blue.drawString(g, GameScr.nCT_TeamA + string.Empty, x - frameWidth / 2 - width, num7 + GameScr.fra_PVE_Bar_1.frameHeight, 0);
 		SmallImage.drawSmallImage(g, 2325, x - frameWidth / 2 - width - 15, num7 + GameScr.fra_PVE_Bar_1.frameHeight, 2, mGraphics.TOP | mGraphics.LEFT);
@@ -7323,22 +7323,22 @@ public class GameScr : mScreen, IChatable
 			int num = GameCanvas.w - width - 20;
 			for (int i = 0; i < GameScr.nTop; i++)
 			{
-				mFont mFont = mFont.tahoma_7_white;
+				mFont f = mFont.tahoma_7_white;
 				if (i == 0)
 				{
-					mFont = mFont.tahoma_7_red;
+					f = mFont.tahoma_7_red;
 				}
 				else if (i == 1)
 				{
-					mFont = mFont.tahoma_7_yellow;
+					f = mFont.tahoma_7_yellow;
 				}
 				else if (i == 2)
 				{
-					mFont = mFont.tahoma_7_blue;
+					f = mFont.tahoma_7_blue;
 				}
 				if (i == GameScr.nTop - 1)
 				{
-					mFont = mFont.tahoma_7_green;
+					f = mFont.tahoma_7_green;
 				}
 				string[] array = Res.split((string)GameScr.res_CT.elementAt(i), "|", 0);
 				int[] array2 = new int[]
@@ -7348,7 +7348,7 @@ public class GameScr : mScreen, IChatable
 				};
 				for (int j = 0; j < 2; j++)
 				{
-					mFont.drawString(g, array[j], num + array2[j], y + i * mFont.tahoma_7.getHeight(), 0, mFont.tahoma_7);
+					f.drawString(g, array[j], num + array2[j], y + i * mFont.tahoma_7.getHeight(), 0, mFont.tahoma_7);
 				}
 			}
 			GameCanvas.resetTrans(g);
@@ -7480,25 +7480,25 @@ public class GameScr : mScreen, IChatable
 		Item[] arrItemBody = global::Char.myCharz().arrItemBody;
 		if (arrItemBody != null && arrItemBody.Length > 5 && GameScr.isItemYardrat(arrItemBody[5]))
 		{
-			GameScr.info1.addInfo("Đang mặc Yardrat", 0);
+			GameScr.info1.addInfo("Äang máº·c Yardrat", 0);
 			Service.gI().gotoPlayer(CharID);
 			return;
 		}
 		int num = GameScr.findYardrat();
 		if (num == -1)
 		{
-			GameScr.info1.addInfo("Không có cải trang Yardrat!", 0);
+			GameScr.info1.addInfo("KhÃ´ng cÃ³ cáº£i trang Yardrat!", 0);
 			return;
 		}
 		if (arrItemBody == null || arrItemBody.Length <= 5 || arrItemBody[5] == null)
 		{
-			GameScr.info1.addInfo("Mặc Yardrat", 0);
+			GameScr.info1.addInfo("Máº·c Yardrat", 0);
 			Service.gI().getItem(4, (sbyte)num);
 			Service.gI().gotoPlayer(CharID);
 			Service.gI().getItem(5, 5);
 			return;
 		}
-		GameScr.info1.addInfo("Đổi Yardrat", 0);
+		GameScr.info1.addInfo("Äá»•i Yardrat", 0);
 		Service.gI().getItem(4, (sbyte)num);
 		Service.gI().gotoPlayer(CharID);
 		Service.gI().getItem(4, (sbyte)num);
@@ -9005,3 +9005,5 @@ public class GameScr : mScreen, IChatable
 	// Token: 0x04000F07 RID: 3847
 	public static bool isudungCapsun3;
 }
+
+

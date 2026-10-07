@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -177,6 +177,7 @@
     <Compile Include="Mod\DungPham\KoiOctiiu957\AutoPoint.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\AutoSkill.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\AutoTrain.cs" />
+    <Compile Include="Mod\DungPham\KoiOctiiu957\AutoTrainDlg.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\SkillSelectDlg.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\AutoZone.cs" />
     <Compile Include="Mod\DungPham\KoiOctiiu957\Boss.cs" />
@@ -267,3 +268,4 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
+

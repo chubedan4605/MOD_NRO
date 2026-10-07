@@ -112,22 +112,22 @@ public class TabClanIcon : IActionListener
 			if (num2 + this.WIDTH - ((TabClanIcon.scrMain == null) ? 0 : TabClanIcon.scrMain.cmy) >= this.y + this.disStart && num2 - ((TabClanIcon.scrMain == null) ? 0 : TabClanIcon.scrMain.cmy) <= this.y + this.disStart + this.h)
 			{
 				ClanImage clanImage2 = (ClanImage)ClanImage.vClanImage.elementAt(i);
-				mFont mFont = mFont.tahoma_7_grey;
+				mFont f = mFont.tahoma_7_grey;
 				if (i == this.lastSelect)
 				{
-					mFont = mFont.tahoma_7_blue;
+					f = mFont.tahoma_7_blue;
 				}
 				if (clanImage2.name != null)
 				{
-					mFont.drawString(g, clanImage2.name, num + 20, num2, 0);
+					f.drawString(g, clanImage2.name, num + 20, num2, 0);
 				}
 				if (clanImage2.xu > 0)
 				{
-					mFont.drawString(g, clanImage2.xu + " " + mResources.XU, num + this.w - 20, num2, mFont.RIGHT);
+					f.drawString(g, clanImage2.xu + " " + mResources.XU, num + this.w - 20, num2, mFont.RIGHT);
 				}
 				else if (clanImage2.luong > 0)
 				{
-					mFont.drawString(g, clanImage2.luong + " " + mResources.LUONG, num + this.w - 20, num2, mFont.RIGHT);
+					f.drawString(g, clanImage2.luong + " " + mResources.LUONG, num + this.w - 20, num2, mFont.RIGHT);
 				}
 				if (clanImage2.idImage != null)
 				{
@@ -341,3 +341,4 @@ public class TabClanIcon : IActionListener
 	// Token: 0x04001348 RID: 4936
 	private ScrollResult sr;
 }
+

@@ -4488,7 +4488,7 @@ public class Panel : IActionListener, IChatable
 						mFont.tahoma_7_grey.drawString(g, zones[i] + string.Empty, num4 + num5 / 2, num2 + 6, mFont.CENTER);
 					}
 
-					bool isFull = (pts[i] == 1) || (GameScr.gI().numPlayer != null && GameScr.gI().maxPlayer != null && i < GameScr.gI().numPlayer.Length && i < GameScr.gI().maxPlayer.Length && GameScr.gI().numPlayer[i] >= GameScr.gI().maxPlayer[i]);
+					bool isFull = (GameScr.gI().numPlayer != null && GameScr.gI().maxPlayer != null && i < GameScr.gI().numPlayer.Length && i < GameScr.gI().maxPlayer.Length && GameScr.gI().numPlayer[i] >= GameScr.gI().maxPlayer[i]);
 					bool isAutoThis = Mod.DungPham.KoiOctiiu957.AutoZone.isAuto && Mod.DungPham.KoiOctiiu957.AutoZone.targetZone == zones[i];
 
 					string textZone = GameScr.gI().numPlayer[i] + "/" + GameScr.gI().maxPlayer[i];
@@ -7268,10 +7268,23 @@ public class Panel : IActionListener, IChatable
 		this.addThachDauDetail((TopInfo)this.vTop.elementAt(this.selected));
 	}
 
-	// Token: 0x06000949 RID: 2377 RVA: 0x00008353 File Offset: 0x00006553
 	private void doFireMapTrans()
 	{
-		this.doFireZone();
+		if (this.selected == -1)
+		{
+			return;
+		}
+		if (this.mapNames == null || this.selected < 0 || this.selected >= this.mapNames.Length)
+		{
+			return;
+		}
+		Res.outz("FIRE MAP TRANS: " + this.selected);
+		if (Mod.DungPham.KoiOctiiu957.AutoZone.isAuto)
+		{
+			Mod.DungPham.KoiOctiiu957.AutoZone.Stop();
+		}
+		this.isChangeZone = true;
+		GameCanvas.panel.hide();
 	}
 
 	// Token: 0x0600094A RID: 2378 RVA: 0x0008A410 File Offset: 0x00088610
@@ -9034,6 +9047,10 @@ public class Panel : IActionListener, IChatable
 
 	private void doFireZone()
 	{
+		if (this.type != 3)
+		{
+			return;
+		}
 		if (this.selected == -1)
 		{
 			return;
@@ -9044,8 +9061,7 @@ public class Panel : IActionListener, IChatable
 		}
 
 		int zoneId = GameScr.gI().zones[this.selected];
-		bool isFull = (GameScr.gI().pts != null && this.selected < GameScr.gI().pts.Length && GameScr.gI().pts[this.selected] == 1)
-					|| (GameScr.gI().numPlayer != null && GameScr.gI().maxPlayer != null 
+		bool isFull = (GameScr.gI().numPlayer != null && GameScr.gI().maxPlayer != null 
 						&& this.selected < GameScr.gI().numPlayer.Length && this.selected < GameScr.gI().maxPlayer.Length 
 						&& GameScr.gI().numPlayer[this.selected] >= GameScr.gI().maxPlayer[this.selected]);
 
